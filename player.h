@@ -45,9 +45,6 @@ public:
     bool verificaDubluInventar(Obiect *ObiectPrimit) ;     //verifica dublicitatea armelor in inventar
     void furaRandomArma() ;//scoet arma din inventar
     int getNumarArme() const;
-
-    
-    
     int getPotiuniFolosite() const; 
     Obiect* getArmaCurenta() const;        
 };
