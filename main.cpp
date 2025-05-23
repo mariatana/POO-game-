@@ -12,6 +12,7 @@
 #include "lupta.h"
 #include "cufar.h"
 #include "npc.h"
+#include "materie.h"
 #include <vector>
 #include <sstream>
 #include <limits>
@@ -23,6 +24,8 @@ using namespace std;
 vector<Obiect*> obiecteGlobal;
 //VECTORUL GLOBAL DE CAMERE
 vector<Camera*> camere;
+//VECTOR GLOBAL MATERII PRIME
+vector <MateriePrima*> materii;
 int MonstriCamereInitial=0;
 void afiseazaIntroducere() {
     cout << "You have high fever...\n";
@@ -84,7 +87,27 @@ Obiect* daObiectRandom(Player* player, const std::vector<Obiect*>& obiecteGlobal
 
 }
 
+void creeazaMaterialeGlobale(std::vector<MateriePrima*>& materii)
+{
+    materii.push_back(new MateriePrima("osDragon",2));
+    materii.push_back(new MateriePrima("infinitefire",1));
+    materii.push_back(new MateriePrima("poison",3));
+    materii.push_back(new MateriePrima("poison",2));
+    materii.push_back(new MateriePrima("blades",4));
+    materii.push_back(new MateriePrima("poisonflower",2));
+    materii.push_back(new MateriePrima("blades",1));
+    materii.push_back(new MateriePrima("infinitefire",2));
+    materii.push_back(new MateriePrima("osDragon",3));
+    materii.push_back(new MateriePrima("blades",1));
 
+
+
+}
+MateriePrima* daMaterieRandom(Player* player, const std::vector<MateriePrima*>& materii) {
+    if (materii.empty()) return nullptr;
+    int indexRandom = std::rand() % materii.size();
+    return materii[indexRandom];
+}
 vector<Camera*> CreareHarta(const string& NumeFisier) {
     ifstream fin(NumeFisier);
     vector<Camera*> camere;
@@ -137,6 +160,7 @@ vector<Camera*> CreareHarta(const string& NumeFisier) {
                                }
     //dupa ce am creat harta, pun obiectele in vectorul global
     creeazaObiecteGlobale(obiecteGlobal);
+    creeazaMaterialeGlobale(materii);
 
     return camere;
 }
@@ -321,9 +345,10 @@ int main()
         cout<<"2.Vezi harta"<<endl;
         cout<<"3.Alege camera in care vrei sa mergi"<<endl;
         cout<<"4.Du-te la magazin"<<endl;
-        cout<<"5.Inspecteza inventar"<<endl;
+        cout<<"5.Inspecteza inventar arme"<<endl;
         cout<<"6.Verifica sanatate"<<endl;
         cout<<"7.Renunta"<<endl;
+        cout<<"8.Inspecteaza inventar materie prima"<<endl;
         //asta separat de meniu as vrea sa am un random event care sa aiba cumva mostenire multipla 
         cin >> optiune2;
         cin.ignore();
@@ -346,13 +371,13 @@ int main()
                else if(cameraCurenta->getInamic()==nullptr&&cameraCurenta->getCufar()->getStateCufar()==false)
                 {
                     cout<<"Vrei sa deschizi cufarul?"<<endl;
-                    cout<<"15.DA"<<endl;
-                    cout<<"16.NU"<<endl;
+                    cout<<"1.DA"<<endl;
+                    cout<<"1.NU"<<endl;
                     int raspunsCufar2;
                     cin>>raspunsCufar2;
                     switch(raspunsCufar2)
                     {
-                        case 15:
+                        case 1:
                         {
                             cameraCurenta->getCufar()->folosesteCufar();
                             cout << "Inspectezi cufarul..." << endl;
@@ -365,7 +390,7 @@ int main()
                            cin.get();
                             break;
                         }
-                        case 16:
+                        case 2:
                         {
                             cout<<"Apasa ENTER pentru a te intoarce la meniu.."<<endl;
                            cin.get();
@@ -441,10 +466,12 @@ int main()
                          int BaniCastigati=cameraCurenta->getInamic()->randomMoney();//se adauga bani in functie de boss ul omorat
                          player->AdaugaBani(BaniCastigati);
                          Obiect *obiectPrimit= daObiectRandom(player, obiecteGlobal);
+                         MateriePrima *materiePrimita=daMaterieRandom(player,materii);
+                         player->adaugaMateriePrima(materiePrimita);
                          Potiune *potiune=dynamic_cast<Potiune*>(obiectPrimit);//urmeaza sa vad daca obiectul este potiune
                          //daca e potiune, o folosesc indiferent
                          //afisare comeback
-                         cout << "Ai invins inamicul!"<<" Ai primit "<<BaniCastigati<<" bani si un obiect: "<<obiectPrimit->getNume()<< endl;
+                         cout << "Ai invins inamicul!"<<" Ai primit "<<BaniCastigati<<" un obiect: "<<obiectPrimit->getNume()<< "si materia prima: "<<materiePrimita->getNume()<<endl;
                          if(player->getMonstriBatuti()==MonstriCamereInitial)
                          {
                             cout<<"FELICITARI!AI CASTIGAT! AI INVINS TOTI MONSTRI!"<<endl;
@@ -478,8 +505,10 @@ int main()
 
                             cout << "Inspectezi cufarul..." << endl;
                             Obiect *obiectPrimit=daObiectRandom(player,obiecteGlobal);
+                             MateriePrima *materiePrimita=daMaterieRandom(player,materii);
+                             player->adaugaMateriePrima(materiePrimita);
                             Potiune *potiune=dynamic_cast<Potiune*>(obiectPrimit);//urmeaza sa vad daca obiectul este potiune
-                            cout<<"Felicitari!ai primit: "<<*obiectPrimit<<endl;
+                            cout<<"Felicitari!ai primit: "<<*obiectPrimit<<"si materia prima: "<<materiePrimita->getNume()<<endl;
                             if(potiune)
                             {
                                 player->folosestePotiune(potiune);
@@ -627,6 +656,15 @@ int main()
             {
             cout<<"Proasta alegere..nu ai curaj..poate ca nu te vei mai trezi niciodata..";
             exit(0);
+            }
+            case 8:
+            {
+                cout<<"===INVENTAR MATERIE PRIMA: ==="<<endl;
+                cout<<endl;
+                player->afiseazaInventarMaterie();
+                cout<<endl;
+                cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
+                cin.get();
             }
         }
     }

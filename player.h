@@ -1,10 +1,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-
+#include <map>
 #include "actor.h"
 #include "camera.h"
 #include "Obiect.h"
 #include "potiune.h"
+#include "materie.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -13,14 +14,17 @@ class Camera;
 class Obiect;
 class Potiune;
 class Arma;
+class MateriePrima;
 class Player : public Actor {
 private:
     int pocket;                             // Banii jucătorului
     std::vector<Obiect*> inventar;          // Inventarul (arme, poțiuni etc.)
     Camera* curentCamera;                   // Camera curentă în care se află jucătorul
     Obiect* armaCurenta;                    // Arma pe care o folosește momentan
-    static int MonstriBatuti;          
+    static int MonstriBatuti;
+    map<string, MateriePrima> inventarmaterii;       
     int potiuniFolosite;                    // Poate fi util pentru afișare finală/statistici
+   
 
 public:
     Player(int health,Camera* cameraStart, int p);     // Constructor cu cameră inițială și bani
@@ -46,6 +50,8 @@ public:
     void furaRandomArma() ;//scoet arma din inventar
     int getNumarArme() const;
     int getPotiuniFolosite() const; 
-    Obiect* getArmaCurenta() const;        
+    Obiect* getArmaCurenta() const;    
+    void adaugaMateriePrima(MateriePrima *m);    
+    void afiseazaInventarMaterie();
 };
 #endif

@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "obiect.h"
 #include "inamic.h"
+#include "materie.h"
 #include "arma.h"
 #include <string>
 #define RED     "\033[1;31m"
@@ -184,5 +185,31 @@ void Player:: furaRandomArma()
     delete inventar[indexStergere];
     inventar.erase(inventar.begin() + indexStergere);
 }
+void Player::adaugaMateriePrima(MateriePrima* m) {
+    std::string nume = m->getNume();
+    int cant = m->getCantitate();
+
+    if (inventarmaterii.find(nume) != inventarmaterii.end()) {
+        inventarmaterii[nume].adaugaCantitate(cant);  // daca am gasit doar cresc cantitatea
+    } else {
+        inventarmaterii[nume] = *m;
+    }
+}
+void Player::afiseazaInventarMaterie() {
+    int i = 0;
+    if (inventarmaterii.empty()) {
+    cout << "Inventarul de materii prime este gol." << endl;
+}
+else
+{
+    for (const auto& entry : inventarmaterii) {
+        i++;
+        cout << i << ". " << entry.first            // cheia (numele materiei)
+             << " - cantitate: " << entry.second.getCantitate() << endl;
+    }
+}
+}
+
+
 
 
