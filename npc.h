@@ -5,7 +5,6 @@
 #include <iostream>
 #include "player.h"
 
-// Struct definit global, poate fi folosit în alte clase/functii
 struct NpcInfo {
     std::string nume;
     std::string mesaj;

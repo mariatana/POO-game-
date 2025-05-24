@@ -2,24 +2,26 @@
 #include "Camera.h"
 #include <iostream>
 #include <vector>
+
 using namespace std;
 
-Actor:: Actor(int h):health(h){};
-Actor:: ~Actor(){}
-void Actor:: getStatus() const
-{
-    cout<<"Current health: "<<health<<endl;
+Actor::Actor(int health) : m_health(health) {}
+
+Actor::~Actor() {}
+
+void Actor::getStatus() const {
+    cout << "Current health: " << m_health << endl;
 }
+
 int Actor::getHealth() const {
-    return health;
+    return m_health;
 }
 
-void Actor::setHealth(int h) {
-    health = h;
-}
-void Actor::scadeViata(int dmg) {
-    health -= dmg;
-    if (health < 0) health = 0;
+void Actor::setHealth(int health) {
+    m_health = health;
 }
 
-
+void Actor::scadeViata(int damage) {
+    m_health -= damage;
+    if (m_health < 0) m_health = 0;
+}

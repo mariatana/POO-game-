@@ -3,15 +3,16 @@
 
 #include "player.h"
 #include "inamic.h"
+
 class Player;
 class Lupta {
 private:
-    Player* player;
-    Inamic* inamic;
+    Player* m_player;
+    Inamic* m_inamic;
 
 public:
-    Lupta(Player* p, Inamic* i);   // Constructor
-    bool start();                  // Corect: FĂRĂ parametri!
+    Lupta(Player* p, Inamic* i);
+    bool start();
 };
 
 #endif

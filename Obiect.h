@@ -1,4 +1,3 @@
-// ===== Obiect.h =====
 #ifndef OBIECT_H
 #define OBIECT_H
 
@@ -7,23 +6,24 @@
 
 class Obiect {
 private:
-    int damage;              // Valoarea de damage pe care o provoacă obiectul (dacă e o armă)
-    int raritate;            // Raritatea obiectului, poate influența șansele de drop
-    std::string nume;        // Numele obiectului
-    static int obiecteInInventar; // Contor static pentru obiectele aflate în joc
-    int pret;
+    int m_damage;
+    int m_raritate;
+    std::string m_nume;
+    static int m_obiecte_in_inventar;
+    int m_pret;
 
 public:
-    Obiect(int d, int r, const std::string& n,int pret);          // Constructor
-    Obiect(const Obiect& other);                         // Constructor de copiere
-    virtual ~Obiect();                                   // Destructor virtual
-    friend std::ostream & operator<<(std::ostream& os, const Obiect &obj);//overl operator << 
-    virtual void foloseste() = 0;                        // Funcție virtuală pură
-    int getDamage() const;                               // Returnează damage-ul
-    int getRaritate() const;                            
-    std::string getNume() const;                         
-    static int getNrObiecte();    
-    virtual Obiect* clone() const = 0; // funcție pur virtuală  
-    int getPret()const;                     
+    Obiect(int damage, int raritate, const std::string& nume, int pret);
+    Obiect(const Obiect& other);
+    virtual ~Obiect();
+    friend std::ostream& operator<<(std::ostream& os, const Obiect& obj);
+    virtual void foloseste() = 0;
+    int getDamage() const;
+    int getRaritate() const;
+    std::string getNume() const;
+    static int getNrObiecte();
+    virtual Obiect* clone() const = 0;
+    int getPret() const;
 };
+
 #endif

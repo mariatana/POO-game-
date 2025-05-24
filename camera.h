@@ -8,21 +8,20 @@
 class Inamic;
 class Obiect;
 class Cufar;
-class Camera 
-{
+
+class Camera {
 private:
-    int IdCamera;
-    std::string Descriere;
-    std::vector<Obiect*> obiecte;
-    std::vector<Camera*> vecini;
-    Inamic* inamic;
-    bool eMagazin;
-    bool ismonster;
-    Cufar *cufar;
+    int m_id_camera;
+    std::string m_descriere;
+    std::vector<Obiect*> m_obiecte;
+    std::vector<Camera*> m_vecini;
+    Inamic* m_inamic;
+    bool m_e_magazin;
+    bool m_e_monstru;
+    Cufar* m_cufar;
 
 public:
-    Camera(int IdCamera, std::string Descriere, bool eMagazin,bool ismonster);
-    
+    Camera(int id_camera, std::string descriere, bool e_magazin, bool e_monstru);
     int getId() const;
     std::string getDescriere() const;
     bool esteMagazin() const;

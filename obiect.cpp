@@ -3,44 +3,46 @@
 #include "camera.h"
 #include <vector>
 #include <string>
-int Obiect::obiecteInInventar = 0; // Inițializare variabilă statică
 
+int Obiect::m_obiecte_in_inventar = 0;
 
-// Constructor clasic
-Obiect::Obiect(int d, int r, const std::string& n,int pret) : damage(d), raritate(r), nume(n),pret(pret) {
-    obiecteInInventar++;
+Obiect::Obiect(int damage, int raritate, const std::string& nume, int pret)
+    : m_damage(damage), m_raritate(raritate), m_nume(nume), m_pret(pret) {
+    m_obiecte_in_inventar++;
 }
 
-// Constructor de copiere
-Obiect::Obiect(const Obiect& other) : damage(other.damage), raritate(other.raritate), nume(other.nume) {
-    obiecteInInventar++;
+Obiect::Obiect(const Obiect& other)
+    : m_damage(other.m_damage), m_raritate(other.m_raritate),
+      m_nume(other.m_nume), m_pret(other.m_pret) {
+    m_obiecte_in_inventar++;
 }
+
 std::ostream& operator<<(std::ostream& os, const Obiect& obj) {
-    os << obj.getNume() << " (Damage: " << obj.getDamage() << ", Raritate: " << obj.getRaritate() << ")";
+    os << obj.getNume() << " (Damage: " << obj.getDamage()
+       << ", Raritate: " << obj.getRaritate() << ")";
     return os;
 }
 
-// Destructor
 Obiect::~Obiect() {
-    obiecteInInventar--;
+    m_obiecte_in_inventar--;
 }
 
 int Obiect::getDamage() const {
-    return damage;
+    return m_damage;
 }
 
 int Obiect::getRaritate() const {
-    return raritate;
+    return m_raritate;
 }
 
 std::string Obiect::getNume() const {
-    return nume;
+    return m_nume;
 }
 
 int Obiect::getNrObiecte() {
-    return obiecteInInventar;
+    return m_obiecte_in_inventar;
 }
-int Obiect::getPret() const
-{
-    return this->pret;
+
+int Obiect::getPret() const {
+    return m_pret;
 }

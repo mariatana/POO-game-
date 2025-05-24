@@ -2,56 +2,57 @@
 #include "cufar.h"
 
 using namespace std;
-Camera::Camera(int IdCamera,std::string Descriere, bool eMagazin,bool ismonster)
-    :IdCamera(IdCamera),Descriere(Descriere),eMagazin(eMagazin),ismonster(ismonster){
-        cufar=new Cufar(false);
-    }
-int Camera::getId() const
-{
-    return IdCamera;
-}
-std::string Camera:: getDescriere() const
-{
-    return Descriere;
 
+Camera::Camera(int id_camera, std::string descriere, bool e_magazin, bool e_monstru)
+    : m_id_camera(id_camera), m_descriere(descriere),
+      m_e_magazin(e_magazin), m_e_monstru(e_monstru) {
+    m_cufar = new Cufar(false);
 }
-bool Camera:: esteMagazin() const
-{
-    return eMagazin;
+
+int Camera::getId() const {
+    return m_id_camera;
 }
-const vector<Camera*>& Camera:: getVecini() const
-{
-    return vecini;
+
+std::string Camera::getDescriere() const {
+    return m_descriere;
 }
-const vector<Obiect*>& Camera:: getObiecte() const
-{
-    return obiecte;
+
+bool Camera::esteMagazin() const {
+    return m_e_magazin;
 }
-void Camera:: adaugaObiect(Obiect* o)
-{
-    obiecte.push_back(o);
+
+const vector<Camera*>& Camera::getVecini() const {
+    return m_vecini;
 }
-void Camera:: adaugaVecini(Camera *c)
-{
-    vecini.push_back(c);
+
+const vector<Obiect*>& Camera::getObiecte() const {
+    return m_obiecte;
 }
-void Camera::setInamic(Inamic *i)
-{
-    inamic=i;
+
+void Camera::adaugaObiect(Obiect* o) {
+    m_obiecte.push_back(o);
 }
-Inamic* Camera::getInamic() const
-{
-    return inamic;
+
+void Camera::adaugaVecini(Camera* c) {
+    m_vecini.push_back(c);
 }
-bool Camera ::emonstru() const
-{
-    return ismonster;
+
+void Camera::setInamic(Inamic* i) {
+    m_inamic = i;
 }
-Cufar * Camera::getCufar() const
-{
-    return cufar;
+
+Inamic* Camera::getInamic() const {
+    return m_inamic;
 }
-Camera:: ~Camera()
-{
-    delete cufar;
+
+bool Camera::emonstru() const {
+    return m_e_monstru;
+}
+
+Cufar* Camera::getCufar() const {
+    return m_cufar;
+}
+
+Camera::~Camera() {
+    delete m_cufar;
 }

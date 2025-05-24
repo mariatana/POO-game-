@@ -1,6 +1,6 @@
 #include "cufar.h"
 
-Cufar::Cufar(bool used) : used(false) {}   
+Cufar::Cufar(bool used) : m_used(false) {}
 
 Cufar::~Cufar() {}
 
@@ -9,9 +9,9 @@ void Cufar::folosesteCufar() {
 }
 
 bool Cufar::getStateCufar() const {
-    return used;
+    return m_used;
 }
 
 void Cufar::schimbaStareCufar() {
-    used = true;
+    m_used = true;
 }
