@@ -14,5 +14,7 @@ class MateriePrima
     int getCantitate() const;
     string getNume() const;
     void adaugaCantitate(int x);
+    void consuma(int x);
+   MateriePrima& operator+=(const MateriePrima& other); 
 };
 #endif

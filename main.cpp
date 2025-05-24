@@ -15,6 +15,8 @@
 #include "materie.h"
 #include <vector>
 #include <sstream>
+#include <chrono>
+#include <thread>
 #include <limits>
 #include <cstdlib>
 #include <map>
@@ -262,13 +264,64 @@ void afiseazaharta() {
 
     cout << "\n===========================================\n";
 }
+void efectCrafting() {
+    cout << "\nCrafting";
+    cout.flush(); // forțează afișarea imediată
+    for (int i = 0; i < 3; ++i) {
+        this_thread::sleep_for(std::chrono::seconds(1));
+        cout << ".";
+        cout.flush();
+    }
+    this_thread::sleep_for(std::chrono::seconds(1));
+    cout << "\n";
+}
+void craft(Player *p)
+{
+    bool crafting =true;
+    while(crafting)
+    {
+    cout<<"Retete disponibile: "<<endl;
+    cout<<"1.PoisonBlades (1 blades, 2 posisonFlower, 4 poison )"<<endl;
 
+    cout<<"2.Revino la meniul principal"<<endl;
+    cout<<"Alege optiunea : "<<endl;
+    int op;
+    cin>>op;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    switch(op)
+    {
+        case 1:
+        {
+            if(p->AreMaterie("blades",1)&&p->AreMaterie("poisonflower",2)&&p->AreMaterie("poison",4))
+            {
+                p->consumaMateriePunte("blades",1);
+                p->consumaMateriePunte("poisonflower",2);
+                p->consumaMateriePunte("poison",4);
+                p->AdaugaObiect(new Arma(30,1,"PoisonBlades",0));
+                efectCrafting();
+                cout<<"Ai craftat PoisonBlades"<<endl;
+            }
+            cout<<"Enter pentru a reveni la crafting table"<<endl;
+            cin.get();
+            break;
+        }
+        case 2:
+        {
+            crafting=false;
+            break;
+        }
+       crafting=false;
+    }
+}
+
+}
 
 void asteaptaEnter() {
     cout << "\nApasa Enter pentru a reveni la meniu...";
     cin.ignore(numeric_limits<streamsize>::max(), '\n'); // golire buffer
     cin.get(); // așteaptă Enter
 }
+
 
 //! foloseste namespace 
 using namespace std;
@@ -331,7 +384,6 @@ int main()
     int optiune2;
     bool IntrareCamera=true;
     int alegecamera;
-
     cout<<"===START ROOM==="<<endl;
     cout<<"Te afli in prima camera"<<endl;
     cout<<"================"<<endl;
@@ -349,6 +401,7 @@ int main()
         cout<<"6.Verifica sanatate"<<endl;
         cout<<"7.Renunta"<<endl;
         cout<<"8.Inspecteaza inventar materie prima"<<endl;
+        cout<<"9.Crafteaza"<<endl;
         //asta separat de meniu as vrea sa am un random event care sa aiba cumva mostenire multipla 
         cin >> optiune2;
         cin.ignore();
@@ -663,6 +716,12 @@ int main()
                 cout<<endl;
                 player->afiseazaInventarMaterie();
                 cout<<endl;
+                cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
+                cin.get();
+                break;
+            }
+            case 9:
+            {    craft(player);
                 cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
                 cin.get();
             }

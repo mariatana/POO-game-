@@ -53,5 +53,9 @@ public:
     Obiect* getArmaCurenta() const;    
     void adaugaMateriePrima(MateriePrima *m);    
     void afiseazaInventarMaterie();
+    bool AreMaterie(const string &nume, int cantMin);
+    void consumaMateriePunte(const string &nume,int cant);//am scris si aici o functie consuma deoarece trebuei sa am o punte intre player->materie pt ca in main in functia craft am ca parametru doar pointer player si functia cosuma este in materiePrima
+
+                                                        
 };
 #endif

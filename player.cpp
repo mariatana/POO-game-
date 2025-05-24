@@ -209,7 +209,20 @@ else
     }
 }
 }
-
+bool Player:: AreMaterie(const string &nume,int cantMin)
+{
+    auto it=inventarmaterii.find(nume);
+    return it!=inventarmaterii.end()&&it->second.getCantitate()>=cantMin;
+}
+void Player::consumaMateriePunte(const string &nume,int cant)
+{
+    auto it=inventarmaterii.find(nume);
+    if(it!=inventarmaterii.end())
+    {
+        it->second.consuma(cant);
+    }
+    
+}
 
 
 

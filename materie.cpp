@@ -18,3 +18,15 @@ void MateriePrima::adaugaCantitate(int x)
 {
    cantitate+=x;
 }
+MateriePrima& MateriePrima::operator+=(const MateriePrima& other) {
+    if (nume == other.nume) {
+        cantitate += other.cantitate;
+    } else {
+        throw std::invalid_argument("Nu poți aduna materii diferite!");
+    }
+    return *this;
+}
+void MateriePrima::consuma(int x)
+{
+    cantitate-=x;
+}
