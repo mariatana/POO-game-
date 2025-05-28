@@ -1,9 +1,7 @@
 #include "Obiect.h"
-// #include "inamic.h" // Nu pare necesar aici
-// #include "camera.h" // Nu pare necesar aici
-// #include <vector> // Nu pare necesar aici
+
 #include <string>
-#include <sstream> // Pentru getDetaliiMagazin
+#include <sstream> 
 
 int Obiect::m_obiecte_in_inventar = 0;
 
@@ -19,7 +17,7 @@ Obiect::Obiect(const Obiect& other)
 }
 
 std::ostream& operator<<(std::ostream& os, const Obiect& obj) {
-    // Afisarea in stream ramane generala, sau poate fi imbogatita cu getDetaliiMagazin
+   
     os << obj.getNume() << " (Raritate: " << obj.getRaritate() << ")";
     return os;
 }
@@ -28,7 +26,7 @@ Obiect::~Obiect() {
     m_obiecte_in_inventar--;
 }
 
-int Obiect::getValoareEfect() const { // Redenumit din getDamage
+int Obiect::getValoareEfect() const { 
     return m_valoare_efect;
 }
 

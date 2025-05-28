@@ -805,6 +805,6 @@ int main() {
     }
     materii_globale_prototipuri.clear();
 
-    std::cout << "Toate resursele au fost eliberate. La revedere!\n";
+   
     return 0;
 }

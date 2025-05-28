@@ -2,7 +2,7 @@
 #include <string>
 #include "materie.h"
 
-using namespace std;
+
 
 // Constructor: inițializează materia cu un nume și o cantitate
 MateriePrima::MateriePrima(const string& nume, int cantitate)

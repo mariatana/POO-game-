@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 
-using namespace std;
+
 
 // Constructor: inițializează un inamic cu viață, damage minim/maxim și nume
 Inamic::Inamic(int health, int min_dmg, int max_dmg, const std::string& nume)
@@ -25,7 +25,7 @@ int Inamic::getMinimDamage() const {
 // Afișează un mesaj în care inamicul lovește jucătorul
 void Inamic::afiseazaLovitura() const {
     int dmg = randomPunch(); // Se calculează damage-ul generat aleator
-    cout << m_monster_name << " te-a lovit cu " << dmg << " damage!" << endl;
+    std::cout << m_monster_name << " te-a lovit cu " << dmg << " damage!" << '\n';
 }
 
 // Returnează o sumă de bani câștigată după ce învingi inamicul
@@ -35,7 +35,7 @@ int Inamic::randomMoney() const {
 
 // Afișează viața curentă a inamicului
 void Inamic::getStatus() const {
-    cout << m_monster_name << " are " << getHealth() << " HP." << endl;
+    std::cout << m_monster_name << " are " << getHealth() << " HP." << '\n';
 }
 
 // Returnează numele inamicului

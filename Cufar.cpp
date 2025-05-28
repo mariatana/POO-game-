@@ -1,6 +1,6 @@
 #include "cufar.h"
 
-Cufar::Cufar(bool used) : m_used(false) {}
+Cufar::Cufar(bool m_used) : m_used(m_used) {}
 
 Cufar::~Cufar() {}
 

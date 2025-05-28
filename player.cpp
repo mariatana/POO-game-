@@ -39,9 +39,16 @@ Player::~Player() {
     }
     m_inventar.clear();
 }
-
+bool Player::verificaDubluInventar(Obiect* obiect_primit) const { // Adaugat const
+    if (!obiect_primit) return true;
+    for (Obiect* o : m_inventar)
+        if (o && o->getNume() == obiect_primit->getNume())
+            return false;
+    return true;
+}
 void Player::AdaugaObiect(Obiect* o) {
     if (!o) return;
+    if(Player::verificaDubluInventar(o))
     m_inventar.push_back(o);
     if (!m_arma_curenta) {
         Arma* arma = dynamic_cast<Arma*>(o);
@@ -51,7 +58,7 @@ void Player::AdaugaObiect(Obiect* o) {
     }
 }
 
-void Player::stergeObiectDinInventar(Obiect* obj) {
+/*void Player::stergeObiectDinInventar(Obiect* obj) {
     if (!obj) return;
     auto it = std::find(m_inventar.begin(), m_inventar.end(), obj);
     if (it != m_inventar.end()) {
@@ -62,7 +69,7 @@ void Player::stergeObiectDinInventar(Obiect* obj) {
         delete *it; 
         m_inventar.erase(it);
     }
-}
+}*/
 
 
 int Player::getPocket() const {
@@ -166,13 +173,7 @@ void Player::schimbaArma(const std::string& nume) {
         std::cout << "Nu exista nicio arma cu acest nume in inventar sau obiectul nu este o arma.\n";
 }
 
-bool Player::verificaDubluInventar(Obiect* obiect_primit) const { // Adaugat const
-    if (!obiect_primit) return true;
-    for (Obiect* o : m_inventar)
-        if (o && o->getNume() == obiect_primit->getNume())
-            return false;
-    return true;
-}
+
 
 int Player::getNumarArme() const {
     int count = 0;

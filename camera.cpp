@@ -1,7 +1,7 @@
 #include "camera.h"
 #include "cufar.h"
 #include "inamic.h"
-using namespace std;
+
 
 Camera::Camera(int id_camera, std::string descriere, bool e_magazin, bool e_monstru)
     : m_id_camera(id_camera),
