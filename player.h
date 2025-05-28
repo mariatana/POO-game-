@@ -6,24 +6,19 @@
 #include <string>
 #include <iostream>
 #include "actor.h"
-#include "camera.h"
-#include "Obiect.h"
-#include "potiune.h"
-#include "materie.h"
+#include "materie.h" 
 
-class Inamic;
 class Camera;
 class Obiect;
-class Potiune;
-class Arma;
-class MateriePrima;
+class Arma;   
 
 class Player : public Actor {
 private:
     int m_pocket;
     std::vector<Obiect*> m_inventar;
     Camera* m_curent_camera;
-    Obiect* m_arma_curenta;
+    Arma* m_arma_curenta; 
+     static const int MAX_OBIECTE_INVENTAR = 10;
     static int m_monstri_batuti;
     std::map<std::string, MateriePrima> m_inventar_materii;
     int m_potiuni_folosite;
@@ -31,7 +26,7 @@ private:
 public:
     Player(int health, Camera* camera_start, int p);
     ~Player() override;
-
+     bool PoateAdaugaObiect() const;
     void AdaugaObiect(Obiect* o);
     void AdaugaBani(int p);
 
@@ -39,24 +34,31 @@ public:
     void ScadeBani(int p);
     void afiseazaLovitura() const override;
     void getStatus() const override;
-    static void AdaugaMosntriBatuti();
-    int getMonstriBatuti();
+    static void AdaugaMonstriBatuti();
+    static int getMonstriBatuti();
     Camera* getCamera() const;
     void SetCamera(Camera* new_camera);
 
     void afiseazaInventar() const;
-    void schimbaArma(std::string nume);
-    void seteazaArma(Obiect* arma);
-    void folosestePotiune(Potiune* p);
-    bool verificaDubluInventar(Obiect* obiect_primit);
-    void furaRandomArma();
+    void schimbaArma(const std::string& nume);
+    void seteazaArma(Arma* arma); 
+
+    
+
+    bool verificaDubluInventar(Obiect* obiect_primit) const; 
+  
     int getNumarArme() const;
     int getPotiuniFolosite() const;
-    Obiect* getArmaCurenta() const;
+    void adaugaPotiuneFolosita();
+    Arma* getArmaCurenta() const;
+
     void adaugaMateriePrima(MateriePrima* m);
-    void afiseazaInventarMaterie();
-    bool AreMaterie(const std::string& nume, int cant_min);
+    void afiseazaInventarMaterie() const; 
+    bool AreMaterie(const std::string& nume, int cant_min) const;
     void consumaMateriePunte(const std::string& nume, int cant);
+
+    void cresteViata(int valoare);
+    void stergeObiectDinInventar(Obiect* obj); 
 };
 
 #endif

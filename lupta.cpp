@@ -3,6 +3,7 @@
 #include "player.h"
 #include "Obiect.h"
 #include "inamic.h"
+#include "arma.h"
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -25,7 +26,7 @@ bool Lupta::start() {
     // Loop-ul principal al luptei continuă cât timp ambii sunt în viață
     while (m_player->getHealth() > 0 && m_inamic->getHealth() > 0) {
         // Jucătorul atacă
-        int dmg = m_player->getArmaCurenta()->getDamage();
+        int dmg = m_player->getArmaCurenta()->getValoareEfect();
         cout << "Ai lovit cu " << dmg << " damage\n";
         m_inamic->scadeViata(dmg);  // Se scade viața inamicului
         cout << "Inamicul are acum " << m_inamic->getHealth() << " HP.\n";
@@ -42,7 +43,7 @@ bool Lupta::start() {
     // Se verifică rezultatul luptei și se afișează mesajul corespunzător
     if (m_player->getHealth() > 0) {
         cout << GREEN << "Ai castigat lupta!" << RESET << endl;
-        Player::AdaugaMosntriBatuti();  // Se incrementează contorul de monștri învinși
+        Player::AdaugaMonstriBatuti();  // Se incrementează contorul de monștri învinși
         return true;
     } else {
         cout << "Ai fost invins in lupta...\n";

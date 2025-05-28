@@ -8,7 +8,6 @@ using namespace std;
 MateriePrima::MateriePrima(const string& nume, int cantitate)
     : m_nume(nume), m_cantitate(cantitate) {}
 
-// Destructor gol — nu avem alocări dinamice aici
 MateriePrima::~MateriePrima() {}
 
 // Returnează cantitatea curentă de materie
@@ -32,12 +31,12 @@ MateriePrima& MateriePrima::operator+(const MateriePrima& other) {
     if (m_nume == other.m_nume) {
         m_cantitate += other.m_cantitate;
 
-        // Dacă nu începe deja cu "Super", prefixează cu "Super"
+        
         if (m_nume.find("Super") != 0) {
             m_nume = "Super" + m_nume;
         }
     } else {
-        // Aruncă excepție dacă încerci să aduni materii diferite
+       
         throw std::invalid_argument("Nu poți aduna materii diferite!");
     }
     return *this;

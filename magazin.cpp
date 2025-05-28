@@ -7,13 +7,18 @@ void Magazin::adaugaObiect(Obiect* obj) {
 
 // Afișează toate obiectele disponibile în magazin
 void Magazin::afiseazaStoc() const {
-    for (int i = 0; i < m_stoc.size(); ++i) {
-        std::cout << i << ". " << m_stoc[i]->getNume()            // Numele obiectului
-                  << " (Pret: " << m_stoc[i]->getPret()           // Prețul obiectului
-                  << ", Damage: " << m_stoc[i]->getDamage() << ")\n";  // Damage-ul (dacă e armă)
+    if (m_stoc.empty()) {
+        std::cout << "Magazinul este gol momentan.\n";
+        return;
+    }
+    std::cout << "Bunuri disponibile in magazin:\n";
+    for (size_t i = 0; i < m_stoc.size(); ++i) {
+        if (m_stoc[i]) {
+        
+            std::cout << i << ". " << m_stoc[i]->getDetaliiMagazin() << "\n";
+        }
     }
 }
-
 // Permite jucătorului să cumpere un obiect din magazin, dacă are bani suficienți
 Obiect* Magazin::cumparaObiect(int index, Player* player) {
     // Verifică dacă indexul este valid
@@ -35,4 +40,7 @@ Obiect* Magazin::cumparaObiect(int index, Player* player) {
         std::cout << "Nu ai destui bani pentru acest obiect!\n";
         return nullptr;                       // Nu s-a putut face achiziția
     }
+}
+bool Magazin::esteGol() const {
+    return m_stoc.empty();
 }

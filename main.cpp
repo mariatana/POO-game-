@@ -1,10 +1,18 @@
 #include <iostream>
 #include <fstream>
-#include <cstring>
+#include <string> 
+#include <vector>
+#include <map>
+#include <sstream>
+#include <chrono>
+#include <thread>
+#include <limits>   
+#include <cstdlib>  
+#include <algorithm> 
 
 #include "camera.h"
 #include "inamic.h"
-#include "actor.h"
+
 #include "player.h"
 #include "arma.h"
 #include "Obiect.h"
@@ -15,795 +23,788 @@
 #include "npc.h"
 #include "materie.h"
 
-#include <map>
-#include <vector>
-#include <sstream>
-#include <chrono>
-#include <thread>
-#include <limits>
-#include <cstdlib>
-#include <map>
-#include <algorithm>
-using namespace std;
-//VECTORUL GLOBAL CU OBIECTE:
-vector<Obiect*> obiecte_global;
-//VECTORUL GLOBAL DE CAMERE
-vector<Camera*> camere;
-//VECTOR GLOBAL MATERII PRIME
-vector <MateriePrima*> materii;
-int monstri_camere_initial=0;
-void afiseazaIntroducere() {
-    cout << "You have high fever...\n";
-    cout << "You are going deeper and deeper into deep sleep...\n";
-    cout << "But no... something is wrong...\n";
-    cout << "You woke up in a strange room... let's insepct the place.\n\n";
-}
 
+
+#ifndef MAIN_TEXT_COLORS_DEFINED
+#define MAIN_TEXT_COLORS_DEFINED
+#define TEXT_RED     "\033[1;31m"
+#define TEXT_GREEN   "\033[1;32m"
+#define TEXT_YELLOW  "\033[1;33m"
+#define TEXT_RESET   "\033[0m"
+#endif
+
+// Variabilele globale pentru prototipuri si camerele jocului
+std::vector<Obiect*> obiecte_globale_prototipuri;
+std::vector<Camera*> camere_joc;
+std::vector<MateriePrima*> materii_globale_prototipuri;
+int monstri_camere_initial = 0;
+
+void afiseazaIntroducere() {
+    std::cout << "You have high fever...\n";
+    std::cout << "You are going deeper and deeper into deep sleep...\n";
+    std::cout << "But no... something is wrong...\n";
+    std::cout << "You woke up in a strange room... let's inspect the place.\n\n";
+}
 
 void afiseazaReguli() {
-    cout << "\n========= RULES =========\n";
-    cout << "-> Explore 10 dream-rooms.\n";
-    cout << "-> Find helpful items (weapons, potions).\n";
-    cout << "-> Defeat enemies using the items you find.\n";
-    cout << "-> You cannot beat the strongest enemy unless you're well prepared!\n";
-    cout << "-> You can teleport to the Shop at any time.\n";
-    cout << "-> Survive the Fever Dream.\n";
-    cout << "-> Always check your health!\n";
-    cout<<"->Press Enter to return to main menu";
-
+    std::cout << "\n========= RULES =========\n";
+    std::cout << "-> Explore 10 dream-rooms.\n";
+    std::cout << "-> Find helpful items (weapons, potions).\n";
+    std::cout << "-> Defeat enemies using the items you find.\n";
+    std::cout << "-> You cannot beat the strongest enemy unless you're well prepared!\n";
+    std::cout << "-> You can teleport to the Shop at any time using the main menu options.\n"; // Clarificare
+    std::cout << "-> Survive the Fever Dream.\n";
+    std::cout << "-> Always check your health!\n";
+    std::cout << "-> Press Enter to return to main menu";
 }
 
-
-void creeazaObiecteGlobale(std::vector<Obiect*>& obiecte_global) {
-    //pun obiectele din vector
-    obiecte_global.push_back(new Arma(10, 3, "Sabie de Fier",0));
-    obiecte_global.push_back(new Potiune(20, 2, "Apa vie", true,0));
-    obiecte_global.push_back(new Arma(15, 2, "Topor Viking",0));
-    obiecte_global.push_back(new Potiune(10,3 , "Potiune de Viata light", true,0));
-    obiecte_global.push_back(new Potiune(30, 2, "Potiune Norocoasa", true,0));
-    obiecte_global.push_back(new Arma(20, 2, "katana",0));
-    obiecte_global.push_back(new Arma(30, 1, "pistol",0));
-    obiecte_global.push_back(new Potiune(40, 1, "Potiune Blestemata", false,0));
-    obiecte_global.push_back(new Potiune(40, 1, "Leacul spiridusului", true,0));
-    obiecte_global.push_back(new Arma(37, 1, "DragonBall",0));
-    obiecte_global.push_back(new Arma(19, 1, "HalBerd",0));
-    obiecte_global.push_back(new Arma(37, 1, "Claymore",0));//sabie mare:) referinta Dark
-     obiecte_global.push_back(new Potiune(39, 2, "fairyheal", true,0));
-    obiecte_global.push_back(new Arma(16, 1, "Daggar",0));
-    obiecte_global.push_back(new Potiune(18, 2, "WitchBreath", false,0));
-    obiecte_global.push_back(new Arma(37, 1, "Claymore",0));
-    obiecte_global.push_back(new Arma(33, 1, "zweihander",0));
-    obiecte_global.push_back(new Arma(25, 1, "scythe",0));
-   
-}
-Obiect* daObiectRandom(Player* player, const std::vector<Obiect*>& obiecte_global) {
-    if (obiecte_global.empty()) return nullptr;
-    // Creează o listă cu probabilități inverse proporționale cu raritatea
-    vector<Obiect*> pool;
-    for (Obiect* o : obiecte_global) {
-
-    for (int i = 0; i < (6 - o->getRaritate()); ++i) 
-        {
-        pool.push_back(o);
-        }
-                                     }
-        //se ia un index random din vector
-        int index = rand() % pool.size();
-        Obiect* obj = pool[index]->clone();
-        return obj;
-
+void creeazaPrototipuriObiecte(std::vector<Obiect*>& proto_obj) {
+    
+    proto_obj.push_back(new Arma(10, 3, "Sabie de Fier", 0));
+    proto_obj.push_back(new Potiune(20, 2, "Apa Vie", true, 0));
+    proto_obj.push_back(new Arma(15, 2, "Topor Viking", 0));
+    proto_obj.push_back(new Potiune(10, 3, "Potiune de Viata Light", true, 0));
+    proto_obj.push_back(new Potiune(30, 2, "Potiune Norocoasa", true, 0));
+    proto_obj.push_back(new Arma(20, 2, "Katana", 0));
+    proto_obj.push_back(new Arma(30, 1, "Pistol", 0));
+    proto_obj.push_back(new Potiune(25, 1, "Potiune Blestemata", false, 0)); // false = rea
+    proto_obj.push_back(new Potiune(40, 1, "Leacul Spiridusului", true, 0));
+    proto_obj.push_back(new Arma(37, 1, "Sfera Dragonului", 0)); 
+    proto_obj.push_back(new Arma(19, 1, "Alabarda", 0)); 
+    proto_obj.push_back(new Arma(37, 1, "Claymore", 0));
+    proto_obj.push_back(new Potiune(39, 2, "Elixirul Zanelor", true, 0)); 
+    proto_obj.push_back(new Arma(16, 1, "Pumnal Ascutit", 0)); 
+    proto_obj.push_back(new Potiune(18, 2, "Suflare de Vrajitoare", false, 0)); 
+    proto_obj.push_back(new Arma(33, 1, "Zweihander", 0)); 
+    proto_obj.push_back(new Arma(25, 1, "Coasa Mortii", 0)); 
 }
 
-void creeazaMaterialeGlobale(std::vector<MateriePrima*>& materii)
-{
-    //pun materialele in vectorul global
-    materii.push_back(new MateriePrima("osDragon",2));
-    materii.push_back(new MateriePrima("infinitefire",1));
-    materii.push_back(new MateriePrima("poison",3));
-    materii.push_back(new MateriePrima("poison",2));
-    materii.push_back(new MateriePrima("blades",4));
-    materii.push_back(new MateriePrima("poisonflower",2));
-    materii.push_back(new MateriePrima("blades",1));
-    materii.push_back(new MateriePrima("infinitefire",2));
-    materii.push_back(new MateriePrima("osDragon",3));
-    materii.push_back(new MateriePrima("blades",1));
-
-}
-void AdaugaMagazin(Magazin &magazin)
-{
- magazin.adaugaObiect(new Arma(20, 2, "Katana",20));
- magazin.adaugaObiect(new Potiune(30, 1, "Potiune Super Heal", true,50));
- magazin.adaugaObiect(new Potiune(30, 1, "axe", true,15));
- magazin.adaugaObiect(new Potiune(35, 1, "sulita", true,34));
-}
-MateriePrima* daMaterieRandom(Player* player, const std::vector<MateriePrima*>& materii) {
-    //algoritm pt a primi materie random
-    if (materii.empty()) return nullptr;
-    int index_random = std::rand() % materii.size();
-    return materii[index_random];
-}
-vector<Camera*> CreareHarta(const string& nume_fisier) {
-    ifstream fin(nume_fisier);
-    vector<Camera*> camere;
-    map<int, Camera*> mapa_camere;
-    if (!fin) {
-        cerr << "Eroare la deschiderea fisierului!\n";
-        return camere;
-    }
-    string linie;
-    // 1. Creăm camerele și le punem în mapă
-    while (getline(fin, linie)) {
-        if (linie.empty()) continue;
-        stringstream ss(linie);
-        int idc, are_inamic;
-        string descriere;
-        ss >> idc >> descriere >> are_inamic;
-        Camera* c;
-        if (descriere == "Shop")
-            c = new Camera(idc, descriere, true, are_inamic);
-        else 
-            c = new Camera(idc, descriere, false, are_inamic);
-        camere.push_back(c);
-        mapa_camere[idc] = c;
-        //am folosit map -> fiecare camera are asociat un id
-    }
-
-    // 2. Revin la începutul fișierului pentru a adăuga vecinii
-    fin.clear();
-    fin.seekg(0, ios::beg);
-
-    while (getline(fin, linie)) {
-        if (linie.empty()) continue;
-        stringstream ss(linie);
-        int idc, are_inamic;
-        string descriere;
-        //citesc din nou
-        ss >> idc >> descriere >> are_inamic;
-        //iau cammera curenta
-        Camera* camera_curenta = mapa_camere[idc];
-        int idVecin;
-        //citesc vecinii
-        while (ss >> idVecin) {
-            //caut dupa cheie(id)
-            auto it = mapa_camere.find(idVecin);
-            if (it != mapa_camere.end()) {
-                //adaug vecinii( dupa valoare care este Camera* )
-                camera_curenta->adaugaVecini(it->second);
-             
-            } else {
-                cerr << "Atenție: Vecinul cu id " << idVecin << " nu există pentru camera " << idc << "!\n";
+Obiect* daObiectRandom(const std::vector<Obiect*>& proto_obj) {
+    if (proto_obj.empty()) return nullptr;
+    std::vector<const Obiect*> pool; // Folosim const Obiect* pentru a nu modifica prototipurile
+    for (const Obiect* o_prototip : proto_obj) {
+        if (o_prototip) {
+            for (int i = 0; i < (6 - o_prototip->getRaritate()); ++i) {
+                pool.push_back(o_prototip);
             }
         }
-                               }
-    //dupa ce am creat harta, pun obiectele in vectorul global
-    creeazaObiecteGlobale(obiecte_global);
-    //pun si materialele
-    creeazaMaterialeGlobale(materii);
+    }
+    if (pool.empty()) return nullptr;
 
-    return camere;
+    int index = rand() % pool.size();
+    return pool[index]->clone();
+}
+
+void creeazaPrototipuriMaterii(std::vector<MateriePrima*>& proto_materii) {
+    proto_materii.push_back(new MateriePrima("osDragon", 1)); 
+    proto_materii.push_back(new MateriePrima("infinitefire", 1));
+    proto_materii.push_back(new MateriePrima("poison", 1));
+    proto_materii.push_back(new MateriePrima("blades", 1));
+    proto_materii.push_back(new MateriePrima("poisonflower", 1));
+    proto_materii.push_back(new MateriePrima("fierVechi", 1));
+    proto_materii.push_back(new MateriePrima("panzaRufei", 1));
+}
+
+MateriePrima* daMaterieRandom(Player* player, const std::vector<MateriePrima*>& proto_materii) {
+    if (proto_materii.empty()) return nullptr;
+    int index_random = std::rand() % proto_materii.size();
+    // Returnam un pointer la prototip. Player::adaugaMateriePrima va gestiona cum o adauga.
+    // Momentan, Player creeaza o noua MateriePrima pe baza numelui si cantitatii prototipului.
+    if (proto_materii[index_random]) { // Verificam pointerul
+         return proto_materii[index_random]; 
+    }
+    return nullptr;
 }
 
 
+void AdaugaMagazinInitial(Magazin &magazin) {
+    magazin.adaugaObiect(new Arma(20, 2, "Katana", 20));
+    magazin.adaugaObiect(new Potiune(30, 1, "Potiune Super Vindecatoare", true, 50));
+    magazin.adaugaObiect(new Arma(18, 2, "Secure de Lupta", 15)); // Renumit, era Potiune inainte
+    magazin.adaugaObiect(new Arma(22, 1, "Sulita", 34)); // Renumit, era Potiune inainte
+}
 
-void adaugaInamiciCamere(vector<Camera*>&camere)
-{
-    for (Camera* c : camere) {
-         
-        if (!c->emonstru()) {
-            //daca nu am monstru in camera
+std::vector<Camera*> CreareHartaJoc(const std::string& nume_fisier) {
+    std::ifstream fin(nume_fisier);
+    std::vector<Camera*> camere_create;
+    std::map<int, Camera*> mapa_camere;
+
+    if (!fin) {
+        std::cerr << TEXT_RED << "Eroare la deschiderea fisierului harti: " << nume_fisier << TEXT_RESET << std::endl;
+        return camere_create;
+    }
+
+    std::string linie;
+    while (getline(fin, linie)) {
+        if (linie.empty() || linie[0] == '#') continue; // Ignora linii goale sau comentarii
+        std::stringstream ss(linie);
+        int idc, are_inamic_flag;
+        std::string descriere_raw; // Citeste toata descrierea initial
+        ss >> idc >> descriere_raw; // Citeste ID si primul cuvant al descrierii
+        
+        // Citeste restul descrierii daca exista spatii
+        std::string temp_desc_part;
+        std::string descriere_finala = descriere_raw;
+        while(ss >> temp_desc_part && !(std::istringstream(temp_desc_part) >> are_inamic_flag)) {
+            descriere_finala += " " + temp_desc_part;
+        }
+        if (!(std::istringstream(temp_desc_part) >> are_inamic_flag)) {
+             ss.clear(); // Curatam starea de eroare a ss daca ultimul cuvant nu era numar
+             if (!(ss >> are_inamic_flag)) { 
+                
+                 std::cerr << TEXT_YELLOW << "Atentie: flag 'are_inamic' neclar sau lipsa pentru camera ID " << idc << ". Presupun 0." << TEXT_RESET << std::endl;
+                 are_inamic_flag = 0;
+             }
+        }
+
+
+        Camera* c;
+        bool este_monstru_in_camera = (are_inamic_flag == 1);
+        if (descriere_finala.find("Shop") != std::string::npos) { // Verificam daca "Shop" e in descriere
+            c = new Camera(idc, descriere_finala, true, este_monstru_in_camera);
+        } else {
+            c = new Camera(idc, descriere_finala, false, este_monstru_in_camera);
+        }
+        camere_create.push_back(c);
+        mapa_camere[idc] = c;
+    }
+
+    fin.clear();
+    fin.seekg(0, std::ios::beg);
+
+    while (getline(fin, linie)) {
+        if (linie.empty() || linie[0] == '#') continue;
+        std::stringstream ss(linie);
+        int idc, dummy_are_inamic;
+        std::string dummy_descriere_raw, dummy_descriere_finala;
+        
+        ss >> idc >> dummy_descriere_raw; // Citim ID si primul cuvant al descrierii
+
+        std::string temp_part;
+        while(ss >> temp_part && !(std::istringstream(temp_part) >> dummy_are_inamic)) {
+            // Consumam descrierea si flag-ul de inamic pentru a ajunge la vecini
+        }
+        // Daca ultimul temp_part nu a fost convertit la dummy_are_inamic, inseamna ca flag-ul e mai incolo
+        if (!(std::istringstream(temp_part) >> dummy_are_inamic)) {
+            ss.clear();
+            ss >> dummy_are_inamic; // Citim flag-ul
+        }
+
+        Camera* camera_curenta = mapa_camere[idc];
+        if (!camera_curenta) continue;
+
+        int idVecin;
+        while (ss >> idVecin) { // Citim ID-urile vecinilor
+            auto it = mapa_camere.find(idVecin);
+            if (it != mapa_camere.end()) {
+                camera_curenta->adaugaVecini(it->second);
+            } else {
+                std::cerr << TEXT_YELLOW << "Atentie: Vecinul cu id " << idVecin << " nu exista pentru camera " << idc << "!" << TEXT_RESET << std::endl;
+            }
+        }
+    }
+    return camere_create;
+}
+
+
+void adaugaInamiciInCamere(std::vector<Camera*>& camere_ptr_vec) {
+    monstri_camere_initial = 0;
+    for (Camera* c : camere_ptr_vec) {
+        if (!c || !c->emonstru() || c->getInamic() != nullptr) { // Daca nu e camera valida, nu e setata sa aiba monstru, sau deja are unul
             continue;
         }
-        // În funcție de ID, atribuim un monstru specific
-        if (c->getId()== 2) {
-            c->setInamic(new Inamic(10,3, 6, "Clicker"));
-        } else if ( c->getId()== 3) {
-            c->setInamic(new Inamic(15,5, 9, "Pyramid Head"));
-        } else if (c->getId() == 4) {
-            c->setInamic(new Inamic(35,6, 10, "Slender Man"));
-        } else if (c->getId() == 5) {
-            c->setInamic(new Inamic(49,7, 12, "Taz"));
-        } 
-        else if (c->getId() == 6) {
-            c->setInamic(new Inamic(60,8, 14, "Scorpion King"));
-        } else if (c->getId() == 7) {
-            c->setInamic(new Inamic(68,10, 16, "Nemesis"));
-        } else if (c->getId() == 8) {
-            c->setInamic(new Inamic(90,12, 20, "Hydra"));
-        }
-        else if (c->getId() == 9) {
-            c->setInamic(new Inamic(110,16, 25, "ItClown"));
-        }
-        else if (c->getId() == 10) {
-            c->setInamic(new Inamic(120,20, 30, "Annabele"));
-        }
-        else if (c->getId() == 11) {
-            c->setInamic(new Inamic(130,30, 40, "Fourkings"));
-        }
-        monstri_camere_initial++;
        
+        if (c->getId() == 2) c->setInamic(new Inamic(10, 3, 6, "Clicker"));
+        else if (c->getId() == 3) c->setInamic(new Inamic(15, 5, 9, "Pyramid Head"));
+        else if (c->getId() == 4) c->setInamic(new Inamic(35, 6, 10, "Slender Man"));
+        else if (c->getId() == 5) c->setInamic(new Inamic(49, 7, 12, "Taz"));
+        else if (c->getId() == 6) c->setInamic(new Inamic(60, 8, 14, "Scorpion King"));
+        else if (c->getId() == 7) c->setInamic(new Inamic(68, 10, 16, "Nemesis"));
+        else if (c->getId() == 8) c->setInamic(new Inamic(90, 12, 20, "Hydra"));
+        else if (c->getId() == 9) c->setInamic(new Inamic(110, 16, 25, "ItClown"));
+        else if (c->getId() == 10) c->setInamic(new Inamic(120, 20, 30, "Annabele"));
+        else if (c->getId() == 11) c->setInamic(new Inamic(130, 30, 40, "Fourkings"));
+
+        if (c->getInamic()) {
+             monstri_camere_initial++;
+        }
     }
-    
 }
 
-
-void afiseazaFisierASCII(const string& nume_fisier) {
-    //functia afiseaza desenele din caractere ascii
-    ifstream fin(nume_fisier);
+void afiseazaFisierASCII(const std::string& nume_fisier) {
+    std::ifstream fin(nume_fisier);
     if (!fin) {
-        cerr << "Eroare la deschiderea fisierului " << nume_fisier << "!\n";
+        std::cerr << TEXT_YELLOW << "Eroare la deschiderea fisierului ASCII: " << nume_fisier << TEXT_RESET << std::endl;
         return;
     }
-
-    string linie;
+    std::string linie;
     while (getline(fin, linie)) {
-        cout << linie << endl;
+        std::cout << linie << std::endl;
     }
-
     fin.close();
 }
 
-
-// returnează numele fișierului ASCII pe baza numelui inamicului
-string obtineFisierASCII(const string& nume_inamic) {
-    map<string, string> hartaFisiere = {//asociere numele fisierului->numele inamicului
+std::string obtineFisierASCII(const std::string& nume_inamic) {
+    std::map<std::string, std::string> hartaFisiere = {
         {"Clicker", "clicker.txt"},
         {"Pyramid Head", "ascii_pyramidhead.txt"},
         {"Slender Man", "ascii_slenderman.txt"},
         {"Taz", "taz.txt"},
         {"Scorpion King", "scorpion.txt"},
         {"Nemesis", "nemesis.txt"},
-        {"Hydra", "hydra.txt"}
+        {"Hydra", "hydra.txt"},
+        {"ItClown", "it_clown.txt"},
+        {"Annabele", "annabelle.txt"},
+        {"Fourkings", "fourkings.txt"}
     };
-
-    auto it = hartaFisiere.find(nume_inamic);//cautam cheia (nume inamic) in mapa
-    if (it != hartaFisiere.end()) {
-        //returnam valoarea(fisierul)
-        return it->second;
-    } else {
-        return ""; // fallback dacă nu există fișier
-    }
+    auto it = hartaFisiere.find(nume_inamic);
+    return (it != hartaFisiere.end()) ? it->second : "";
 }
 
-int TotalMonstriCamere()
-{
-    int total=0;
-    for(Camera *c:camere)
-    {
-        //daca gasim monsru in camera il adaugam la total
-        if(c->getInamic()!=nullptr)
-        total=total+1;
-
-    }
-    return total;
+void afiseazaharta() { //
+    std::cout << "\n============ HARTA FEVER DREAM ============\n\n"; //
+    std::cout << "              [3] PyramidHead -> [4]SlenderMan -> -> -> ->  \n"; //
+    std::cout << "                  |               |                        |\n"; //
+    std::cout << "[1] Start -> [2] Clicker's ->    [5] Taz ->[6] Scorpion -> [7]Nemesis\n"; //
+    std::cout << " |\n"; //
+    std::cout << "[10]Annabele                            |                |\n"; //
+    std::cout << "  |\n"; //
+    std::cout << "[11]FourKings -> -> -> -> -> -> -> ->  [9] ITclown   -> [8]Hydra\n "; //
+    std::cout << "\n===========================================\n"; //
+    std::cout << "Shop-ul este accesibil din meniul principal al camerei (optiunea 4)\n";
 }
 
-
-void afiseazaharta() {
-    cout << "\n============ HARTA FEVER DREAM ============\n\n";
-
-    cout << "              [3] PyramidHead -> [4]SlenderMan -> -> -> ->  \n";
-    cout << "                  |               |                        |\n";          
-    cout << "[1] Start -> [2] Clicker's ->    [5] Taz ->[6] Scorpion -> [7]Nemesis\n";
-    cout << " |\n";                        
-    cout << "[10]Annabele                            |                |\n";                                         
-    cout << "  |\n";                                        
-    cout << "[11]fourKings -> -> -> -> -> -> -> ->  [9] ITclown   -> [8]Hydra\n ";
-
-    cout << "\n===========================================\n";
-}
 void efectCrafting() {
-    //functie pentru efect tip loading
-    cout << "\nCrafting";
-    cout.flush(); // forțează afișarea imediată
+    std::cout << "\nCrafting";
+    std::cout.flush();
     for (int i = 0; i < 3; ++i) {
-        this_thread::sleep_for(std::chrono::seconds(1));
-        cout << ".";
-        cout.flush();
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::cout << ".";
+        std::cout.flush();
     }
-    this_thread::sleep_for(std::chrono::seconds(1));
-    cout << "\n";
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::cout << "\n";
 }
-void craft(Player *p)
-{
-    bool crafting =true;
-    while(crafting)
-    {
-    cout<<"Retete disponibile: "<<endl;
-    cout<<"1.PoisonBlades (1 blades, 2 posisonFlower, 4 poison )"<<endl;
-    cout<<"2.SuperOsDragon (2 oase de dragon)"<<endl;
-    cout<<"3.Revino la meniul principal"<<endl;
-    cout<<"Alege optiunea : "<<endl;
-    int op;
-    cin>>op;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    switch(op)
-    {
-        case 1:
-        {
-            //daca are materialele necesare se vor scoate din inventar si se creaza noua arma
-            if(p->AreMaterie("blades",1)&&p->AreMaterie("poisonflower",2)&&p->AreMaterie("poison",4))
-            {
+
+void gestioneazaCrafting(Player* p) {
+    if (!p) return;
+    bool crafting = true;
+    while (crafting) {
+        std::cout << "\n--- MASA DE CRAFTING ---\n";
+        p->afiseazaInventarMaterie(); // Afiseaza ce materii are jucatorul
+        std::cout << "-----------------------\n";
+        std::cout << "Retete disponibile: \n";
+        std::cout << "1. PoisonBlades (1 blades, 2 poisonflower, 4 poison)\n";
+        std::cout << "2. SuperOsDragon (2 osDragon)\n";
+        std::cout << "3. Inapoi la meniul camerei\n";
+        std::cout << "Alege optiunea: ";
+        int op;
+        std::cin >> op;
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << TEXT_RED << "Optiune invalida. Te rog introdu un numar." << TEXT_RESET << std::endl;
+            continue;
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        switch (op) {
+            case 1: {
+                if (p->AreMaterie("blades", 1) && p->AreMaterie("poisonflower", 2) && p->AreMaterie("poison", 4)) {
+                    if(p->PoateAdaugaObiect())
+                    {
+                    p->consumaMateriePunte("blades", 1);
+                    p->consumaMateriePunte("poisonflower", 2);
+                    p->consumaMateriePunte("poison", 4);
+                    p->AdaugaObiect(new Arma(30, 1, "PoisonBlades", 0));
+                    efectCrafting();
+                     std::cout << TEXT_GREEN << "Ai craftat PoisonBlades!" << TEXT_RESET << std::endl;
+                    }
+                    else
+                    cout<<"Nu ai loc in inventar"<<endl;
+                    
+                   
+                } else {
+                    std::cout << TEXT_YELLOW << "Nu ai suficienta materie prima." << TEXT_RESET << std::endl;
+                }
+                break;
                 
-                p->consumaMateriePunte("blades",1);
-                p->consumaMateriePunte("poisonflower",2);
-                p->consumaMateriePunte("poison",4);
-                p->AdaugaObiect(new Arma(30,1,"PoisonBlades",0));
-                efectCrafting();
-                cout<<"Ai craftat PoisonBlades"<<endl;
             }
-            else
-            cout<<"Nu ai suficienta materie prima"<<endl;
-            cout<<"Enter pentru a reveni la crafting table"<<endl;
-            cin.get();
-            break;
-        }
-        case 2:
-        { 
-            //overload pe operatorul +, se creaza o arma din doua obiecte identice
-             if(p->AreMaterie("osDragon",2))
-             {
-                 p->consumaMateriePunte("osDragon",2);
-                 MateriePrima m1("osDragon", 1);
-                 MateriePrima m2("osDragon", 1);
-                 MateriePrima rezultat = m1 + m2;
-                 Obiect* n = new Arma(25, 1, rezultat.getNume(), 0); // sau alt tip
-                 p->AdaugaObiect(n);
-                 efectCrafting();
-                cout<<"Ai craftat osDragon"<<endl;
-             }
-             else
-               cout<<"Nu ai suficienta materie prima"<<endl;
-            cout<<"Enter pentru a reveni la crafting table"<<endl;
-            cin.get();
-            break;
-        }
-        case 3:
-        {
-            crafting=false;
-            break;
-        }
-       crafting=false;
-    }
-}
-
-}
-
-void asteaptaEnter() {
-    //functie pentru revebire la meniu
-    cout << "\nApasa Enter pentru a reveni la meniu...";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // golire buffer
-    cin.get(); // așteaptă Enter
-}
-using namespace std;
-int main()
-{
-    srand(time(0));
-  //asigur ca nu se vor da mereu aceleasi obiecte 
-  
-    
-    int optiune1;
-    bool ruleaza=true;
-    afiseazaIntroducere();
-    while(ruleaza)
-    {
-       
-        cout << "========= FEVER DREAM =========\n";
-        cout << "1. Play Game\n";
-        cout << "2. See Rules\n";
-        cout << "3. Exit\n";
-        cout << "Choose an option: ";
-        cin >> optiune1;
-        cin.ignore(); // curăță '\n' din buffer
-        switch(optiune1)
-        {
-            case 1:
-            {
-            cout<<"Good luck to get out..(evil laugh haha)"<<endl;
-            //se creaza harta si se adauga inamicii
-            camere=CreareHarta("harta.txt");
-            adaugaInamiciCamere(camere);
-            ruleaza=false;
-            break;
-        
-           }
-            case 2:
-            {
-             afiseazaReguli();
-            cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
-            cin.get();
-            break;
+            case 2: {
+                if (p->AreMaterie("osDragon", 2)) {
+                    if(p->PoateAdaugaObiect())
+                    {
+                    p->consumaMateriePunte("osDragon", 2);
+                    Obiect* n = new Arma(25, 1, "SuperOsDragon", 0);
+                    p->AdaugaObiect(n);
+                    efectCrafting();
+                    std::cout << TEXT_GREEN << "Ai craftat SuperOsDragon!" << TEXT_RESET << std::endl;
+                    }
+                    else
+                    cout<<"Nu ai loc in inventar"<<endl;
+                } else {
+                    std::cout << TEXT_YELLOW << "Nu ai suficienta materie prima." << TEXT_RESET << std::endl;
+                }
+                break;
             }
-            case 3:
-            {
-            cout<<"Exiting Fever Dream..."<<endl;
-            ruleaza=false;
-            break;
+            case 3: {
+                crafting = false;
+                break;
             }
             default:
-            cout<<"Invalid Option.Try again"<<endl;
+                std::cout << TEXT_RED << "Optiune de crafting invalida." << TEXT_RESET << std::endl;
+        }
+         if (crafting) {
+             std::cout << "Apasa Enter pentru a continua la masa de crafting sau scrie 'iesi' pentru a te intoarce la meniul camerei...\n";
+             std::string alegere_crafting;
+             getline(std::cin, alegere_crafting);
+             if (alegere_crafting == "iesi") crafting = false;
+        }
+    }
+}
+
+void asteaptaEnter(bool clearBufferFirst = true) {
+   
+    std::cout << "\nApasa Enter pentru a reveni la meniu...";
+    std::cin.get();
+}
+
+void gestioneazaInspectCufar(Player* player, Camera* camera_curenta, const std::vector<Obiect*>& proto_obj_globale) {
+    if (!player || !camera_curenta || !camera_curenta->getCufar()) {
+        std::cout << TEXT_RED << "Eroare interna: Jucator, camera sau cufar invalid." << TEXT_RESET << std::endl;
+        asteaptaEnter();
+        return;
+    }
+
+    if (camera_curenta->getInamic() != nullptr) {
+        if (camera_curenta->getId() != 1)
+            std::cout << TEXT_YELLOW << "Nu poti deschide cufarul cat timp monstrul pazeste camera!" << TEXT_RESET << std::endl;
+        else 
+            std::cout << "Cufarul din camera de start este gol sau inaccesibil acum." << std::endl;
+    } else if (!camera_curenta->getCufar()->getStateCufar()) {
+        std::cout << "Ai gasit un cufar. Vrei sa il deschizi? (1.DA / 2.NU): ";
+        int rasp_cufar;
+        std::cin >> rasp_cufar;
+        if (std::cin.fail()) {
+            std::cin.clear(); std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << TEXT_RED << "Raspuns invalid." << TEXT_RESET << std::endl;
+            asteaptaEnter(false); return;
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        if (rasp_cufar == 1) {
+            camera_curenta->getCufar()->folosesteCufar(); // Afiseaza "Cufarul este folosit"
+            std::cout << "Inspectezi cufarul...\n";
+            Obiect* obiectPrimit = daObiectRandom(proto_obj_globale);
+            if (obiectPrimit) {
+                std::cout << TEXT_GREEN << "Felicitari! Ai primit: " << obiectPrimit->getNume() << TEXT_RESET << std::endl;
+                Potiune* potiunePrimita = dynamic_cast<Potiune*>(obiectPrimit);
+                if (potiunePrimita) {
+                    std::cout << "Este o potiune, o folosesti imediat!\n";
+                    potiunePrimita->foloseste(player); // Apel polimorfic
+                    delete potiunePrimita; // Potiunea e consumata, dealocam clona
+                    // Verificam daca jucatorul a murit din cauza potiunii
+                    if (player->getHealth() <= 0) {
+                        std::cout << TEXT_RED << "Ai fost rapus de o potiune din cufar!" << TEXT_RESET << std::endl;
+                    }
+                } else {
+                    if(player->PoateAdaugaObiect())
+                    player->AdaugaObiect(obiectPrimit);
+                else
+                    cout<<"Nu ai loc in inventar"<<endl;
+                }
+            } else {
+                std::cout << "Cufarul este gol de data aceasta." << std::endl;
+            }
+            
+            camera_curenta->getCufar()->schimbaStareCufar();
+        }
+    } else {
+        std::cout << "Cufarul din aceasta camera a fost deja deschis." << std::endl;
+    }
+    asteaptaEnter(false);
+}
+
+bool gestioneazaLuptaSiRecompense(Player* player, Camera* camera_curenta, const std::vector<Obiect*>& proto_obj, const std::vector<MateriePrima*>& proto_materii) {
+    if (!player || !camera_curenta || !camera_curenta->getInamic()) return true;
+
+    std::cout << TEXT_YELLOW << "\n!!! Inamic:  !!!" << TEXT_RESET << std::endl;
+    std::string fisierASCII = obtineFisierASCII(camera_curenta->getInamic()->getName());
+    if (!fisierASCII.empty()) afiseazaFisierASCII(fisierASCII);
+    Inamic* current_enemy = camera_curenta->getInamic();
+
+    if (player->getArmaCurenta() && camera_curenta->getInamic()->getMinimDamage() > player->getHealth()) {
+        std::cout << TEXT_YELLOW << "ATENTIE! Acest inamic are minim damage "
+                  << camera_curenta->getInamic()->getMinimDamage()
+                  << " si tu ai " << player->getHealth() << " sanatate." << TEXT_RESET << std::endl;
+    }
+    std::cout << "Esti sigur ca vrei sa lupti? (1.DA / 2.NU): ";
+    int rasp_lupta;
+    std::cin >> rasp_lupta;
+    if (std::cin.fail()) { std::cin.clear(); std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); std::cout << TEXT_RED << "Raspuns invalid." << TEXT_RESET << std::endl; return true;}
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    if (rasp_lupta == 1) {
+        if (!player->getArmaCurenta()) {
+            std::cout << TEXT_RED << "Nu ai nicio arma echipata! Nu poti lupta." << TEXT_RESET << std::endl;
+            asteaptaEnter(false);
+            return true;
+        }
+        Lupta lupta(player, camera_curenta->getInamic());
+        bool castigator = lupta.start();
+
+        if (castigator) {
+            std::cout << TEXT_GREEN << "Ai invins inamicul!" << TEXT_RESET << std::endl;
+
+            int bani_castigati = camera_curenta->getInamic()->randomMoney();
+            player->AdaugaBani(bani_castigati);
+            std::cout << "Ai primit " << bani_castigati << " bani.\n";
+
+            Obiect* obiectLoot = daObiectRandom(proto_obj);
+            if (obiectLoot) {
+                std::cout << "Ai primit obiectul: " << obiectLoot->getNume() << std::endl;
+                Potiune* potiuneLoot = dynamic_cast<Potiune*>(obiectLoot);
+                if (potiuneLoot) {
+                    std::cout << "Este o potiune, o folosesti imediat!\n";
+                    potiuneLoot->foloseste(player);
+                    delete potiuneLoot;
+                    if (player->getHealth() <= 0) {
+                         std::cout << TEXT_RED << "Ai murit din cauza unei potiuni blestemate primite dupa lupta!" << TEXT_RESET << std::endl;
+                        return false; // A murit
+                    }
+                } else {
+                    if(player->PoateAdaugaObiect())
+                    player->AdaugaObiect(obiectLoot);
+                    else
+                    cout<<"Nu ai loc in inventar"<<endl;
+                }
+            }
+
+            MateriePrima* materieLoot_prototip = daMaterieRandom(player, proto_materii);
+            if (materieLoot_prototip) {
+                std::cout << "Ai primit materia prima: " << materieLoot_prototip->getNume() << std::endl;
+                player->adaugaMateriePrima(materieLoot_prototip); // Player gestioneaza copierea datelor
+            }
+
+            delete camera_curenta->getInamic();
+            camera_curenta->setInamic(nullptr);
+
+            if (Player::getMonstriBatuti() == monstri_camere_initial && monstri_camere_initial > 0) {
+                std::cout << TEXT_GREEN << "\nFELICITARI! AI CASTIGAT! AI INVINS TOTI MONSTRII!" << TEXT_RESET << std::endl;
+                std::cout << "In curand o sa te trezesti...\n";
+                std::cout << "In lumea monstrilor adevarati... omenirea.\n";
+                NpcInfo batran_final = {"Batranul Intelept", "Sa nu ai incredere in oameni...", false};
+                NPC npc_final(batran_final);
+                npc_final.Interacționeaza(player);
+                return false; // Semnal pentru a termina jocul (game won)
+            }
+             if (camera_curenta->getCufar() && !camera_curenta->getCufar()->getStateCufar()){
+                 std::cout << "\nMonstrul a fost invins. Acum poti inspecta cufarul (daca nu ai facut-o deja).\n";
+            }
+        } else { // A pierdut lupta
+            std::cout << TEXT_RED << "Ai murit! Game over." << TEXT_RESET << std::endl;
+            return false; // A murit
+        }
+    } else {
+        std::cout << "Ai ales sa nu lupti. Poate data viitoare.\n";
+    }
+    asteaptaEnter(false);
+    return true;
+}
+
+void gestioneazaMagazin(Player* player) { 
+    if (!player) return;
+
+    std::cout << TEXT_GREEN << "\n=== Bine ai venit la Magazin! ===" << TEXT_RESET << std::endl;
+    Magazin magazin_joc; // 
+    AdaugaMagazinInitial(magazin_joc);
+
+    if (magazin_joc.esteGol()) {
+        std::cout << "Magazinul este inchis sau nu are marfa acum.\n";
+        asteaptaEnter();
+        return;
+    }
+
+    bool inMagazin = true;
+    while(inMagazin) {
+        std::cout << "\n--- Vitrina Magazinului ---\n";
+        std::cout << "Bani disponibili: " << player->getPocket() << ".\n";
+        magazin_joc.afiseazaStoc();
+        std::cout << "-------------------------------------\n";
+        std::cout << "1. Cumpara obiect (introdu indexul)\n";
+        std::cout << "2. Iesi din magazin\n";
+        std::cout << "Optiune: ";
+        int opt_magazin;
+        std::cin >> opt_magazin;
+
+        if (std::cin.fail()) {
+            std::cin.clear(); std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << TEXT_RED << "Optiune invalida." << TEXT_RESET << std::endl;
+            continue;
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        switch (opt_magazin) {
+            case 1: {
+                std::cout << "Introdu indexul obiectului dorit: ";
+                int index_obj;
+                std::cin >> index_obj;
+                if (std::cin.fail()) {std::cin.clear(); std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); break;}
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                Obiect* cumparat = magazin_joc.cumparaObiect(index_obj, player);
+                Potiune *pot=dynamic_cast<Potiune *>(cumparat);
+                if(pot)
+                pot->foloseste(player);
+                else
+                 if (cumparat) {
+                    player->AdaugaObiect(cumparat); // Adauga clona in inventar
+                }
+                break;
+            }
+            case 2: {
+                inMagazin = false;
+                std::cout << "Ai iesit din magazin.\n";
+                break;
+            }
+            default:
+                std::cout << TEXT_RED << "Optiune de magazin invalida." << TEXT_RESET << std::endl;
+        }
+    }
+   
+}
 
 
+int main() {
+    srand(static_cast<unsigned int>(time(0)));
 
+    creeazaPrototipuriObiecte(obiecte_globale_prototipuri);
+    creeazaPrototipuriMaterii(materii_globale_prototipuri);
+
+    afiseazaIntroducere();
+    bool ruleaza_jocul_principal = true;
+    bool joc_pornit_efectiv = false;
+
+    while (ruleaza_jocul_principal) {
+        std::cout << "\n========= FEVER DREAM MENU =========\n";
+        std::cout << "1. Play Game\n";
+        std::cout << "2. See Rules\n";
+        std::cout << "3. Exit\n";
+        std::cout << "Choose an option: ";
+        int optiune_meniu_principal;
+        std::cin >> optiune_meniu_principal;
+
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << TEXT_RED << "Optiune invalida. Te rog introdu un numar." << TEXT_RESET << std::endl;
+            continue;
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        switch (optiune_meniu_principal) {
+            case 1:
+                std::cout << "Good luck trying to get out... (evil laugh haha)\n";
+                camere_joc = CreareHartaJoc("harta.txt"); //
+                if (camere_joc.empty()) {
+                    std::cerr << TEXT_RED << "Nu s-a putut crea harta. Jocul nu poate incepe." << TEXT_RESET << std::endl;
+                    // Curatare prototipuri globale inainte de a iesi
+                    //(in caz ca programul zice pa pa sa nu ramana gunoiae :)
+                    for(Obiect* obj : obiecte_globale_prototipuri) delete obj;
+                    obiecte_globale_prototipuri.clear();
+                    for(MateriePrima* mat : materii_globale_prototipuri) delete mat;
+                    materii_globale_prototipuri.clear();
+                    return 1;
+                }
+                adaugaInamiciInCamere(camere_joc);
+                ruleaza_jocul_principal = false;
+                joc_pornit_efectiv = true;
+                break;
+            case 2:
+                afiseazaReguli();
+                asteaptaEnter(false);
+                break;
+            case 3:
+                std::cout << "Exiting Fever Dream...\n";
+                ruleaza_jocul_principal = false;
+                joc_pornit_efectiv = false;
+                break;
+            default:
+                std::cout << TEXT_RED << "Invalid Option. Try again." << TEXT_RESET << std::endl;
         }
     }
 
-    Camera* start_camera = camere[0]; // presupunem că prima cameră e camera de start
-    Player* player = new Player(20,start_camera, 0); // 0 bani la început
-    Camera* camera_curenta = start_camera; //camera curanta este camera de start
-    Obiect* sabie = new Arma(10, 1, "Sabie de start",0); // damage 10, raritate 1
-    player->AdaugaObiect(sabie);//setare arma 
-    int optiune2;
-    bool intrare_camera=true;
-    int alege_camera;
-    cout<<"===START ROOM==="<<endl;
-    cout<<"Te afli in prima camera"<<endl;
-    cout<<"================"<<endl;
-    //mecanica folosirii unui struct 
-    NpcInfo batranul = {"Batranul Intelept", "Sa nu ai incredere in Clicker.", true};
-    NPC npc1(batranul);
-    npc1.Interacționeaza(player);//activare NPC
-    while(intrare_camera)
-    {
-        cout<<"1.Inspecteaza cufar"<<endl;
-        cout<<"2.Vezi harta"<<endl;
-        cout<<"3.Alege camera in care vrei sa mergi"<<endl;
-        cout<<"4.Du-te la magazin"<<endl;
-        cout<<"5.Inspecteza inventar arme"<<endl;
-        cout<<"6.Verifica sanatate"<<endl;
-        cout<<"7.Renunta"<<endl;
-        cout<<"8.Inspecteaza inventar materie prima"<<endl;
-        cout<<"9.Crafteaza"<<endl; 
-        cin >> optiune2;
-        cin.ignore();
-        switch(optiune2)
-        {
+    if (!joc_pornit_efectiv) {
+        // Curatare prototipuri globale daca jocul nu porneste
+        for(Obiect* obj : obiecte_globale_prototipuri) delete obj;
+        obiecte_globale_prototipuri.clear();
+        for(MateriePrima* mat : materii_globale_prototipuri) delete mat;
+        materii_globale_prototipuri.clear();
+        // camere_joc ar trebui sa fie goale aici, dar pentru siguranta:
+        for(Camera* cam : camere_joc) delete cam;
+        camere_joc.clear();
+        std::cout << "Jocul s-a terminat inainte de a incepe efectiv.\n";
+        return 0;
+    }
+
+    Player* player = new Player(70,camere_joc[0], 20);
+    Camera* camera_curenta = camere_joc[0]; // Presupunem ca prima camera e camera de start
+    player->SetCamera(camera_curenta);
+
+    Arma* sabie_start = new Arma(10, 3, "Sabie de lemn", 0); 
+    player->AdaugaObiect(sabie_start);
+    player->seteazaArma(sabie_start);
+
+    std::cout << "\n=== START ROOM ===\n";
+    std::cout << "Te afli in prima camera: " << camera_curenta->getDescriere() << "\n";
+    std::cout << "==================\n";
+
+    NpcInfo batran_info = {"Batranul Intelept", "Clicker-ul ascunde un secret... Nu tot ce straluceste e aur.", true}; 
+    NPC npc_batran(batran_info);
+    npc_batran.Interacționeaza(player);
+
+    bool in_loop_camera = true;
+    while (in_loop_camera && player->getHealth() > 0) { // Adaugam conditia de viata a player-ului in bucla
+        std::cout << "\n--- MENIU CAMERA (" << camera_curenta->getDescriere() << ") ---\n";
+        std::cout << "Sanatate: " << player->getHealth() << " | Bani: " << player->getPocket() << "\n";
+        std::cout << "Arma echipata: " << (player->getArmaCurenta() ? player->getArmaCurenta()->getNume() : "Niciuna") << "\n";
+        std::cout << "----------------------------------\n";
+        std::cout << "1. Inspecteaza cufar\n";
+        std::cout << "2. Vezi harta jocului\n";
+        std::cout << "3. Alege camera in care vrei sa mergi\n";
+        std::cout << "4. Mergi la Magazin\n";
+        std::cout << "5. Inventar Obiecte (si schimba arma)\n";
+     
+        std::cout << "6. Inventar Materie Prima\n"; 
+        std::cout << "7. Crafteaza Obiecte\n";    
+        std::cout << "8. Renunta la joc\n";        
+        std::cout << "Alege optiunea: ";
+        int optiune_camera;
+        std::cin >> optiune_camera;
+
+        if (std::cin.fail()) {
+            std::cin.clear(); std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << TEXT_RED << "Optiune invalida." << TEXT_RESET << std::endl;
+            continue;
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        switch (optiune_camera) {
             case 1:
-            {
-                //daca am monstru in camera sunt doua posibilitati : fie e camera de start si nu am monstru, fie inca nu l am batut
-                //(logica jocului este ca pot deschide cufarul doar dupa ce am invins mosntrul)
-                if(camera_curenta->getInamic()!=nullptr)
-                {
-                    if(camera_curenta->getId()!=1)
-                        cout<<"Nu poti deschide cufarul fara sa bati monstrul!"<<endl;
-                    else
-                        cout<<"Ghinion...cufarul este gol!"<<endl;
-                        cout<<"Apasa ENTER pentru a te intoarce la meniu.."<<endl;
-                        cin.get();
-                }
-
-                //daca nu mai e inamic, dar inca mai e cufar
-                else if(camera_curenta->getInamic()==nullptr&&camera_curenta->getCufar()->getStateCufar()==false)
-                {
-                    cout<<"Vrei sa deschizi cufarul?"<<endl;
-                    cout<<"1.DA"<<endl;
-                    cout<<"1.NU"<<endl;
-                    int raspuns_cufar_2;
-                    cin>>raspuns_cufar_2;
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    switch(raspuns_cufar_2)
-                    {
-                        case 1:
-                        {
-                            //se deschide cufarul si se adauga obiectul primit in inventar
-                            camera_curenta->getCufar()->folosesteCufar();
-                            cout << "Inspectezi cufarul..." << endl;
-                            Obiect *obiectPrimit=daObiectRandom(player,obiecte_global);
-                            cout<<"Felicitari!ai primit: "<<*obiectPrimit<<endl;
-                            player->AdaugaObiect(obiectPrimit);
-                            player->afiseazaInventar(); // Vezi ce ai în inventar
-                            camera_curenta->getCufar()->schimbaStareCufar();//schimb starea cufarului la folosit
-                            cout<<"Apasa ENTER pentru a te intoarce la meniu.."<<endl;
-                            cin.get();
-                            break;
-                        }
-                        case 2:
-                        {
-                            cout<<"Apasa ENTER pentru a te intoarce la meniu.."<<endl;
-                            cin.get();
-                            break;
-                        }
-                        break;
-                    }
-                }
-                    else
-                    {
-                        //cazul in care am invins monstrul si nici nu mai este vreun cufar
-                         cout<<"Ai invins monstrul si nu mai este niciun cufar in camera!"<<endl;
-                         cout<<"Apasa ENTER pentru a te intoarce la meniu.."<<endl;
-                         cin.get();
-                         break;
-                    }
-                     break;
-            }
+                gestioneazaInspectCufar(player, camera_curenta, obiecte_globale_prototipuri);
+                break;
             case 2:
-            {
                 afiseazaharta();
-                cout<<"Apasa ENTER pentru a te intoarce la meniu"<<endl;
-                cin.get();
+                asteaptaEnter(false);
                 break;
-            }
-            case 3:
-            {
-                cout<<"Alege camera"<<endl;
-                cout << "Camerele vecine disponibile sunt: ";
-                //for care merge prin vecinii camerei curente
-                for (auto vecin : camera_curenta->getVecini()) {
-                    cout << vecin->getId() << " (" << vecin->getDescriere() << ") ";}                                                  
-                cin>>alege_camera;
-                bool gasit=false;
-                bool murit=false;
-                bool ok=false;//verifica daca am luat vecinii bine
+            case 3: {
+                std::cout << "\n--- Alegere Camera Vecina ---\n";
+                const auto& vecini = camera_curenta->getVecini();
+                if (vecini.empty()) {
+                    std::cout << "Nu exista iesiri din aceasta camera!\n";
+                    asteaptaEnter(false);
+                } else {
+                    for (size_t i = 0; i < vecini.size(); ++i) {
+                        if(vecini[i])
+                            std::cout << i + 1 << ". Camera " << vecini[i]->getId() << " (" << vecini[i]->getDescriere() << ")\n";
+                    }
+                    std::cout << "Alege numarul camerei (sau 0 pentru a anula): ";
+                    int alege_idx_vecin;
+                    std::cin >> alege_idx_vecin;
+                    if (std::cin.fail()) {std::cin.clear(); std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n'); std::cout << TEXT_RED << "Selectie invalida." << TEXT_RESET << std::endl; break;}
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-                for(Camera* c :camera_curenta->getVecini())
-                 if (c->getId()==alege_camera)
-                 {
-                  //verificare daca camera aleasa de utilizator este vecina cu camera curenta
-                  camera_curenta=c;
-                  ok=true;
-                  player->SetCamera(camera_curenta);
-                  gasit=true;
-                  break;
-                 }
-                 if(ok==false)
-                 {
-                    cout<<"Vecin invalid!"<<endl;
-                    asteaptaEnter();
-                 }
-                 else
-                 {
-                    cout<<"==Ai intrat in camera=="<<camera_curenta->getDescriere()<<endl;
-                     //cazul in care nu am invins inamicul din camera=> am si cufar in camera (caz 1)
-                 if(camera_curenta->getId()!=1&&camera_curenta->getInamic()!=nullptr)
-                 {
-                     cout<<"==Inamicul:=="<<camera_curenta->getInamic()->getName()<<endl;
-                     string nume_inamic = camera_curenta->getInamic()->getName();
-                     string fisierASCII = obtineFisierASCII(nume_inamic);
-                     if (!fisierASCII.empty()) {
-                         afiseazaFisierASCII(fisierASCII);
-                                               }              
-                     else {
-                     cout << "Nu exista desen pentru acest inamic.\n";
-                           }
-                    //se da o avertizare in cazul in care in lupta sunt sanse mari de poierdere
-                     if(camera_curenta->getInamic()->getMinimDamage()>player->getHealth())
-                        cout<<"Esti sigur ca vrei sa lupti? ATENTIE! ACEST INAMIC ARE MINIM DAMAGE "<<camera_curenta->getInamic()->getMinimDamage()<<"si tu ai "<<player->getHealth()<<" sanatate"<<endl;
-                     cout<<"Esti sigur ca vrei sa lupti?"<<endl;
-
-                     cout<<"1.DA"<<endl;
-                     cout<<"2.NU"<<endl;
-
-                     int raspuns_lupta;
-                     cin>>raspuns_lupta;
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                     if(raspuns_lupta==1)
-                     {
-                     //start lupta
-                     Lupta lupta(player, camera_curenta->getInamic());
-                     bool castigator = lupta.start();
-                     if (castigator) {
-                         int bani_castigati=camera_curenta->getInamic()->randomMoney();//se adauga bani in functie de boss ul omorat
-                         player->AdaugaBani(bani_castigati);
-                         Obiect *obiectPrimit= daObiectRandom(player, obiecte_global);
-                         MateriePrima *materiePrimita=daMaterieRandom(player,materii);
-                         player->adaugaMateriePrima(materiePrimita);
-                         Potiune *potiune=dynamic_cast<Potiune*>(obiectPrimit);//urmeaza sa vad daca obiectul este potiune
-                         //daca e potiune, o folosesc indiferent
-                         //afisare comeback
-                         cout << "Ai invins inamicul!"<<" Ai primit "<<bani_castigati<<" bani un obiect: "<<obiectPrimit->getNume()<< "si materia prima: "<<materiePrimita->getNume()<<endl;
-                         if(player->getMonstriBatuti()==monstri_camere_initial)
-                         {
-                            cout<<"FELICITARI!AI CASTIGAT! AI INVINS TOTI MONSTRI!"<<endl;
-                            cout<<"In curand o sa te trezesti..."<<endl;
-                            cout<<"In lumea monstrilor adevarati...omenirea"<<endl;
-                            NpcInfo batranul = {"Batranul Intelept", "Sa nu ai incredere in oameni...", false};
-                            NPC npc1(batranul);
-                            npc1.Interacționeaza(player);
-                            intrare_camera=false;
-                         }
-                         //daca este potiune o folosesc direct, nu se adauga la inventar
-                         if(potiune)
-                            player->folosestePotiune(potiune);
-                         else
-                         //altefl se adauga obiectul in inventar
-                         if(!potiune)
-                            player->AdaugaObiect(obiectPrimit);
-                         player->afiseazaInventar();
-                         //stergem inamcicul din camera 
-                         delete camera_curenta->getInamic();
-                         camera_curenta->setInamic(nullptr);//setam inamicul la null
-                         //--mecanica folosirii cufarului---
-
-                         cout<<"Felicitari...ai invins..uite un cufar, il deschizi?"<<endl;
-                         cout<<"1.DA"<<endl;
-                         cout<<"2.NU"<<endl;
-
-                         int raspuns_cufar;
-                         cin>>raspuns_cufar;
-                          cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                         switch(raspuns_cufar)
-                         {
-                            case 1:
-                            {
-                                //il marcam ca si folosit
-                            camera_curenta->getCufar()->schimbaStareCufar();
-
-                            cout << "Inspectezi cufarul..." << endl;
-                            Obiect *obiectPrimit=daObiectRandom(player,obiecte_global);
-                            MateriePrima *materiePrimita=daMaterieRandom(player,materii);
-                            //adaugam obiectele primite in inventar/ cosnsumam daca nu potiunile
-                            player->adaugaMateriePrima(materiePrimita);
-                            Potiune *potiune=dynamic_cast<Potiune*>(obiectPrimit);//urmeaza sa vad daca obiectul este potiune
-                            cout<<"Felicitari!ai primit: "<<*obiectPrimit<<"si materia prima: "<<materiePrimita->getNume()<<endl;
-                            if(potiune)
-                            {
-                                player->folosestePotiune(potiune);
-                                if(player->getHealth()<=0)
-                                {
-                                    cout<<"Ai murit. Game Over"<<endl;
-                                    exit(0);
+                    if (alege_idx_vecin > 0 && alege_idx_vecin <= static_cast<int>(vecini.size())) {
+                        Camera* camera_selectata = vecini[alege_idx_vecin - 1];
+                        if(camera_selectata) {
+                            camera_curenta = camera_selectata;
+                            player->SetCamera(camera_curenta);
+                            std::cout << "\n== Ai intrat in camera: " << camera_curenta->getDescriere() << " ==\n";
+                            if (camera_curenta->esteMagazin()) {
+                                std::cout << "Aceasta este o zona de magazin. Poti accesa magazinul din meniu.\n";
+                                asteaptaEnter(false);
+                            } else if (camera_curenta->getInamic() != nullptr) {
+                                if (!gestioneazaLuptaSiRecompense(player, camera_curenta, obiecte_globale_prototipuri, materii_globale_prototipuri)) {
+                                    in_loop_camera = false; 
                                 }
+                            } else {
+                                std::cout << "Camera pare linistita.\n";
+                                if (camera_curenta->getCufar() && !camera_curenta->getCufar()->getStateCufar()){
+                                     std::cout << "Observi un cufar neinspectat.\n";
+                                }
+                                asteaptaEnter(false);
                             }
-                            else
-                                player->AdaugaObiect(obiectPrimit);
-                                player->afiseazaInventar(); // Vezi ce ai în inventar
-                                camera_curenta->getCufar()->schimbaStareCufar();//schimb starea cufarului la folosit
-                                cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
-                                cin.get();
-                                break;
-                            }
-                            case 2:
-                            {
-                                cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
-                                cin.get();
-                                break;
-                            }
-                         }
-                        }
-                     else {//else aferent pierderii luptei
-                         cout << "Ai murit! Game over.\n";
-                         exit(0);
-                          }//aici!
-                        }
-                        else
-                        {
-                            //am ales sa nu lupt
-                            cout<<"E ok..keep going..poate alt inamic e potrivit pentru tine"<<endl;
-                            cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
-                            cin.get();
-
-                        }
-                        }
-                        //cazul in care intru intr o camera in care inca mai e cufar, dar nu mai e monstru
-                        else
-                          if(camera_curenta->getInamic()==nullptr&&camera_curenta->getCufar()->getStateCufar()==false)
-                          {
-                            cout<<"hmmm..inca e un cufar aici"<<endl;
-                            asteaptaEnter();
-                            break;
-                          }
-                          else
-                          {
-                            //cazul in care nu mai e nimic
-                             cout<<"se pare ca nu mai este nimic interesant in aceasta camera"<<endl;
-                             asteaptaEnter();
-                             break;
-                          }
-                            if(camera_curenta->getId()==1)
-                            {
-                                //cazul pt camera de start
-                                cout<<"Nimic interesant de vazut aici...continua aventura in celelalte camere"<<endl;
-                                asteaptaEnter();
-                                break;
-                            }
-                 }
-                 
+                        } else { std::cout << TEXT_RED << "Eroare: Camera selectata este invalida." << TEXT_RESET << std::endl;}
+                    } else if (alege_idx_vecin == 0) { std::cout << "Ai ramas in camera curenta.\n"; }
+                    else { std::cout << TEXT_RED << "Selectie invalida pentru camera." << TEXT_RESET << std::endl; }
+                }
                 break;
-
             }
             case 4:
-            {
-            cout<<"===Bine ai venit la magazin==="<<endl;
-            Camera *camera_curenta=camere[11];
-            player->SetCamera(camera_curenta);
-            
-            Magazin magazin;
-            AdaugaMagazin(magazin);
-            cout << "Lista de obiecte pe care le poti cumpara: "<<endl;
-            magazin.afiseazaStoc();
-            cout<<"Momentan ai: "<<player->getPocket()<<" bani"<<endl;
-            cout<<"Vrei sa cumperi ceva?"<<endl;
-            cout<<"1.Da"<<endl;
-            cout<<"2.NU"<<endl;
-            int raspuns_magazin;
-            cin>>raspuns_magazin;
-            if(raspuns_magazin==1)
-            {
-            magazin.afiseazaStoc();
-            cout<<"Scrie indexul obiectului pe care il doresti"<<endl;
-            int index;
-            cin >> index;
-            Obiect* cumparat = magazin.cumparaObiect(index, player);
-            if (cumparat) {
-                player->AdaugaObiect(cumparat);
-            }
-        }
-        else
-        {
-            asteaptaEnter();
-            break;
-            
-        }
-            asteaptaEnter();
-            break;
-            }
-            case 5:
-            {
-                //afisare inventar
+                gestioneazaMagazin(player);
+                asteaptaEnter(false);
+                break;
+            case 5: {
                 player->afiseazaInventar();
-                cout<<"Arma curenta: "<<player->getArmaCurenta()->getNume()<<endl;
-                cout<<"Doresti sa schimbi arma?"<<endl;
-                cout<<"1.DA"<<endl;
-                cout<<"2.NU"<<endl;
-                int optiune_arma;
-                cin>>optiune_arma;
-                cin.ignore();
-                switch(optiune_arma)
-                {
-                    case 1:
-                    {
-                        player->afiseazaInventar();
-                        cout<<"Scrieti numele armei cu care vreti sa schimbati "<<player->getArmaCurenta()->getNume()<<endl;
-                        string nume_arma;
-                       
-                        getline(cin, nume_arma); // citește tot, inclusiv spații
-                        //schimbam arma
-                        player->schimbaArma(nume_arma);
-                        cout<<player->getArmaCurenta()->getNume()<<endl;
-                        cout<<"Apasa Enter pentru a te intoarce la meniu"<<endl;
-                        cin.get();
-                        break;
+                if (player->getNumarArme() > 0) {
+                    std::cout << "\nArma curenta: "
+                              << (player->getArmaCurenta() ? player->getArmaCurenta()->getNume() : "Niciuna")
+                              << std::endl;
+                    std::cout << "Doresti sa schimbi arma? (1.DA / 2.NU): ";
+                    int opt_arma;
+                    std::cin >> opt_arma;
+                    if (std::cin.fail()) {std::cin.clear(); std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');break;}
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    if (opt_arma == 1) {
+                        std::cout << "Scrie numele armei cu care vrei sa schimbi (exact cum apare in inventar): ";
+                        std::string nume_arma_noua;
+                        getline(std::cin, nume_arma_noua);
+                        player->schimbaArma(nume_arma_noua);
                     }
-                
-                   case 2:
-                   {
-                    cout<<"Apasa Enter pentru a te intoarce la meniu"<<endl;
-                   cin.get();
-                    break;
-                   }
+                } else {
+                    std::cout << "Nu ai nicio arma in inventar.\n";
                 }
-                break; 
+                asteaptaEnter(false);
+                break;
             }
             case 6:
-            {
-                player->getStatus();
-                cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
-                cin.get();
-                break;
-            }
-            case 7:
-            {
-            cout<<"Proasta alegere..nu ai curaj..poate ca nu te vei mai trezi niciodata..";
-            exit(0);
-            }
-            case 8:
-            {
-                cout<<"===INVENTAR MATERIE PRIMA: ==="<<endl;
-                cout<<endl;
-                //afisare inventar
                 player->afiseazaInventarMaterie();
-                cout<<endl;
-                cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
-                cin.get();
+                asteaptaEnter(false);
                 break;
-            }
-            case 9:
-            {  
-                //functie de crafting 
-                craft(player);
-                cout<<"Apasa ENTER pentru a reveni la meniu"<<endl;
-                cin.get();
-            }
+            case 7: 
+                gestioneazaCrafting(player);
+                break;
+            case 8: 
+                std::cout << TEXT_YELLOW << "Ai ales sa renunti... Visul febril continua fara tine." << TEXT_RESET << std::endl;
+                in_loop_camera = false;
+                break;
+            default:
+                std::cout << TEXT_RED << "Optiune invalida in camera." << TEXT_RESET << std::endl;
+        }
+
+        if (player->getHealth() <= 0 && in_loop_camera) { // Verificare suplimentara de moarte DUPA actiune
+             in_loop_camera = false;
         }
     }
+
+    std::cout << "\nSfarsitul jocului Fever Dream.\n";
+    // Cleanup
+    delete player;
+    player = nullptr;
+
+    for (Camera* c : camere_joc) {
+        delete c; // Destructorul Camerei ar trebui sa se ocupe de Inamic si Cufar
+    }
+    camere_joc.clear();
+
+    for (Obiect* o_prototip : obiecte_globale_prototipuri) {
+        delete o_prototip;
+    }
+    obiecte_globale_prototipuri.clear();
+
+    for (MateriePrima* m_prototip : materii_globale_prototipuri) {
+        delete m_prototip;
+    }
+    materii_globale_prototipuri.clear();
+
+    std::cout << "Toate resursele au fost eliberate. La revedere!\n";
     return 0;
 }

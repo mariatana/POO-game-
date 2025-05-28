@@ -9,7 +9,7 @@ using namespace std;
 Inamic::Inamic(int health, int min_dmg, int max_dmg, const std::string& nume)
     : Actor(health), m_min_damage(min_dmg), m_max_damage(max_dmg), m_monster_name(nume) {}
 
-// Destructor gol – nu avem alocări dinamice
+
 Inamic::~Inamic() {}
 
 // Generează un damage aleator între valorile minime și maxime
