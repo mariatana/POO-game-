@@ -15,15 +15,16 @@ private:
     static int m_obiecte_in_inventar;
     int m_pret;
 
-public:
+protected:
     Obiect(int valoare_efect, int raritate, const std::string& nume, int pret);
     Obiect(const Obiect& other);
-    virtual ~Obiect();
-    friend std::ostream& operator<<(std::ostream& os, const Obiect& obj);
-
+    
+   
+public:
     // Metoda foloseste va lua un Player ca argument pentru a permite interactiunea
+    virtual ~Obiect();
     virtual void foloseste(Player* utilizator) = 0;
-
+     friend std::ostream& operator<<(std::ostream& os, const Obiect& obj);
     int getValoareEfect() const;
     int getRaritate() const;
     std::string getNume() const;

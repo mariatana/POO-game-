@@ -48,15 +48,11 @@ bool Player::verificaDubluInventar(Obiect* obiect_primit) const { // Adaugat con
 }
 void Player::AdaugaObiect(Obiect* o) {
     if (!o) return;
-    if(Player::verificaDubluInventar(o))
+    if(this->verificaDubluInventar(o))
     m_inventar.push_back(o);
-    if (!m_arma_curenta) {
-        Arma* arma = dynamic_cast<Arma*>(o);
-        if (arma) {
-            m_arma_curenta = arma;
-        }
+    
     }
-}
+
 
 /*void Player::stergeObiectDinInventar(Obiect* obj) {
     if (!obj) return;

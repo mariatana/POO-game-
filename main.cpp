@@ -398,7 +398,7 @@ void gestioneazaInspectCufar(Player* player, Camera* camera_curenta, const std::
             Obiect* obiectPrimit = daObiectRandom(proto_obj_globale);
             if (obiectPrimit) {
                 std::cout << TEXT_GREEN << "Felicitari! Ai primit: " << obiectPrimit->getNume() << TEXT_RESET << std::endl;
-                Potiune* potiunePrimita = dynamic_cast<Potiune*>(obiectPrimit);
+                Potiune* potiunePrimita = dynamic_cast<Potiune*>(obiectPrimit);//verific daca e potiune
                 if (potiunePrimita) {
                     std::cout << "Este o potiune, o folosesti imediat!\n";
                     potiunePrimita->foloseste(player); // Apel polimorfic
@@ -408,7 +408,7 @@ void gestioneazaInspectCufar(Player* player, Camera* camera_curenta, const std::
                         std::cout << TEXT_RED << "Ai fost rapus de o potiune din cufar!" << TEXT_RESET << std::endl;
                     }
                 } else {
-                    if(player->PoateAdaugaObiect())
+                    if(player->PoateAdaugaObiect())//verific daca nu se depaseste limita inventarului
                     player->AdaugaObiect(obiectPrimit);
                 else
                     cout<<"Nu ai loc in inventar"<<endl;
@@ -639,7 +639,7 @@ int main() {
         obiecte_globale_prototipuri.clear();
         for(MateriePrima* mat : materii_globale_prototipuri) delete mat;
         materii_globale_prototipuri.clear();
-        // camere_joc ar trebui sa fie goale aici, dar pentru siguranta:
+        // camere_joc ar trebui sa fie goala aici, dar pentru siguranta:
         for(Camera* cam : camere_joc) delete cam;
         camere_joc.clear();
         std::cout << "Jocul s-a terminat inainte de a incepe efectiv.\n";

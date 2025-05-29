@@ -22,11 +22,12 @@ private:
     static int m_monstri_batuti;
     std::map<std::string, MateriePrima> m_inventar_materii;
     int m_potiuni_folosite;
+    bool verificaDubluInventar(Obiect* obiect_primit) const; 
 
 public:
     Player(int health, Camera* camera_start, int p);
     ~Player() override;
-     bool PoateAdaugaObiect() const;
+    bool PoateAdaugaObiect() const;
     void AdaugaObiect(Obiect* o);
     void AdaugaBani(int p);
 
@@ -45,7 +46,7 @@ public:
 
     
 
-    bool verificaDubluInventar(Obiect* obiect_primit) const; 
+    
   
     int getNumarArme() const;
     int getPotiuniFolosite() const;
@@ -55,7 +56,7 @@ public:
     void adaugaMateriePrima(MateriePrima* m);
     void afiseazaInventarMaterie() const; 
     bool AreMaterie(const std::string& nume, int cant_min) const;
-    void consumaMateriePunte(const std::string& nume, int cant);
+   void consumaMateriePunte(const std::string& nume, int cant);
 
     void cresteViata(int valoare);
     void stergeObiectDinInventar(Obiect* obj); 
